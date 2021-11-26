@@ -33,12 +33,8 @@ namespace NEP.Hitmarkers
             {
                 _instance = this;
             }
-            else
-            {
-                Destroy(_instance.gameObject);
-            }
 
-            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(_instance);
         }
 
         private void Start()

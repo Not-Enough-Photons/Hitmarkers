@@ -17,8 +17,6 @@ namespace NEP.Hitmarkers
         public List<AudioClip> hitAudio { get; private set; }
         public List<AudioClip> hitFinisherAudio { get; private set; }
 
-        private List<AnimationClip> hitmarkerAnimations;
-
         private AudioSource _source;
 
         public bool finisherHitmarker = false;
@@ -27,12 +25,6 @@ namespace NEP.Hitmarkers
         {
             hitAudio = HitmarkersMain.hitAudio;
             hitFinisherAudio = HitmarkersMain.hitFinisherAudio;
-
-            hitmarkerAnimations = new List<AnimationClip>()
-            {
-                HitmarkersMain.resources.LoadAsset("hm_appear1").Cast<AnimationClip>(),
-                HitmarkersMain.resources.LoadAsset("hm_appear2").Cast<AnimationClip>()
-            };
 
             AudioSource source = gameObject.AddComponent<AudioSource>();
             source.playOnAwake = true;
@@ -55,28 +47,16 @@ namespace NEP.Hitmarkers
 
             if (finisherHitmarker)
             {
-                SetClip(hitFinisherClip);
-                _source.PlayOneShot(_source.clip);
+                _source.PlayOneShot(hitFinisherClip);
                 animator.Play("hm_finisher_appear1");
             }
             else
             {
-                SetClip(hitAudioClip);
-                _source.PlayOneShot(_source.clip);
+                _source.PlayOneShot(hitAudioClip);
                 PlayRandomAnim();
             }
 
             MelonLoader.MelonCoroutines.Start(CoHide());
-        }
-
-        private void OnDisable()
-        {
-
-        }
-
-        public void SetClip(AudioClip clip)
-        {
-            _source.clip = clip;
         }
 
         public void UseFinisherHitmarker(bool use)
