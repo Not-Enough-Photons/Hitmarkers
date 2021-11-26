@@ -16,9 +16,10 @@ namespace NEP.Hitmarkers
 
         public static HitmarkerManager _instance;
 
-        public static List<Hitmarker> hitmarkerPool;
+        public static List<Hitmarker> regularHitmarkerPool;
+        public static List<Hitmarker> finisherHitmarkerPool;
 
-        public List<AIBrain> deadNPCs;
+        public List<BehaviourBaseNav> deadNPCs;
 
         public bool startKill { get; set; }
 
@@ -42,18 +43,30 @@ namespace NEP.Hitmarkers
 
         private void Start()
         {
-            hitmarkerPool = new List<Hitmarker>();
-            deadNPCs = new List<AIBrain>();
+            HitmarkerManager.regularHitmarkerPool = new List<Hitmarker>();
+            HitmarkerManager.finisherHitmarkerPool = new List<Hitmarker>();
+            deadNPCs = new List<BehaviourBaseNav>();
 
-            Transform hitmarkerPoolChild = new GameObject("Hitmarker Pool").transform;
-            hitmarkerPoolChild.SetParent(transform);
+            Transform regularHitmarkerPool = new GameObject("Regular Hitmarker Pool").transform;
+            Transform finisherHitmarkerPool = new GameObject("Finisher Hitmarker Pool").transform;
+            regularHitmarkerPool.SetParent(transform);
+            finisherHitmarkerPool.SetParent(transform);
 
             for(int i = 0; i < hitmarkerPoolCount; i++)
             {
-                Hitmarker hitmarker = new GameObject($"Hitmarker {i}").AddComponent<Hitmarker>();
+                Hitmarker hitmarker = new GameObject($"Regular Hitmarker {i}").AddComponent<Hitmarker>();
                 hitmarker.gameObject.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                hitmarker.transform.SetParent(hitmarkerPoolChild);
-                hitmarkerPool.Add(hitmarker);
+                hitmarker.transform.SetParent(regularHitmarkerPool);
+                HitmarkerManager.regularHitmarkerPool.Add(hitmarker);
+            }
+
+            for(int i = 0; i < hitmarkerPoolCount; i++)
+            {
+                Hitmarker hitmarker = new GameObject($"Finisher Hitmarker {i}").AddComponent<Hitmarker>();
+                hitmarker.gameObject.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                hitmarker.transform.SetParent(finisherHitmarkerPool);
+                hitmarker.UseFinisherHitmarker(true);
+                HitmarkerManager.finisherHitmarkerPool.Add(hitmarker);
             }
         }
 
@@ -61,7 +74,7 @@ namespace NEP.Hitmarkers
         {
             for (int i = 0; i < deadNPCs.Count; i++)
             {
-                if (deadNPCs[i].behaviour.health.cur_hp > 0f || deadNPCs[i] == null)
+                if (deadNPCs[i].health.cur_hp > 0f || deadNPCs[i] == null)
                 {
                     deadNPCs.RemoveAt(i);
                 }
@@ -77,12 +90,12 @@ namespace NEP.Hitmarkers
 
             if(navBehaviour.puppetMaster.isDead) { return; }
 
-            SpawnHitmarker(brain, impactWorld);
+            SpawnHitmarker(navBehaviour.puppetMaster.isKilling, impactWorld);
         }
 
-        private static void SpawnHitmarker(AIBrain brain, Vector3 position)
+        public static void SpawnHitmarker(bool isFinisher, Vector3 position)
         {
-            Hitmarker hitmarker = hitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active);
+            Hitmarker hitmarker = isFinisher ? finisherHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active) : regularHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active);
 
             lastHitmarker = hitmarker;
 
@@ -93,20 +106,7 @@ namespace NEP.Hitmarkers
 
         private static void SetupHitmarker(Hitmarker hitmarker, Vector3 position)
         {
-            AudioClip hitAudioClip = hitmarker.hitAudio[Random.Range(0, hitmarker.hitAudio.Count)];
-            AudioClip hitFinisherClip = hitmarker.hitFinisherAudio[Random.Range(0, hitmarker.hitFinisherAudio.Count)];
-
             hitmarker.transform.position = position;
-
-            if (hitmarker.finisherHitmarker)
-            {
-                hitmarker.SetClip(hitFinisherClip);
-                hitmarker.animator.Play("hm_finisher_appear1");
-            }
-            else
-            {
-                hitmarker.SetClip(hitAudioClip);
-            }
         }
 
         private static bool EvaluateHealth(SubBehaviourHealth healthModule)
@@ -137,8 +137,9 @@ namespace NEP.Hitmarkers
     {
         public static void Postfix(BehaviourBaseNav __instance)
         {
-            HitmarkerManager._instance.deadNPCs.Add(__instance.GetComponentInParent<AIBrain>());
-            HitmarkerManager.lastHitmarker.finisherHitmarker = true;
+            HitmarkerManager._instance.deadNPCs.Add(__instance);
+            HitmarkerManager.lastHitmarker.gameObject.SetActive(false);
+            HitmarkerManager.SpawnHitmarker(true, HitmarkerManager.lastHitmarker.transform.position);
         }
     }
 }

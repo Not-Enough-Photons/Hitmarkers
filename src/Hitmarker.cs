@@ -28,7 +28,6 @@ namespace NEP.Hitmarkers
             hitAudio = HitmarkersMain.hitAudio;
             hitFinisherAudio = HitmarkersMain.hitFinisherAudio;
 
-
             hitmarkerAnimations = new List<AnimationClip>()
             {
                 HitmarkersMain.resources.LoadAsset("hm_appear1").Cast<AnimationClip>(),
@@ -46,37 +45,37 @@ namespace NEP.Hitmarkers
             renderer = plane.GetComponent<MeshRenderer>();
             animator = plane.GetComponent<Animator>();
 
-            AudioClip hitAudioClip = hitAudio[Random.Range(0, hitAudio.Count)];
-            AudioClip hitFinisherClip = hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
-
-            if (finisherHitmarker)
-            {
-                _source.clip = hitFinisherClip;
-            }
-            else
-            {
-                _source.clip = hitAudioClip;
-            }
-
             gameObject.SetActive(false);
         }
 
         private void OnEnable()
         {
-            PlayRandomAnim();
+            AudioClip hitAudioClip = hitAudio[Random.Range(0, hitAudio.Count)];
+            AudioClip hitFinisherClip = hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
+
+            if (finisherHitmarker)
+            {
+                SetClip(hitFinisherClip);
+                _source.PlayOneShot(_source.clip);
+                animator.Play("hm_finisher_appear1");
+            }
+            else
+            {
+                SetClip(hitAudioClip);
+                _source.PlayOneShot(_source.clip);
+                PlayRandomAnim();
+            }
 
             MelonLoader.MelonCoroutines.Start(CoHide());
         }
 
-        private void OnDiable()
+        private void OnDisable()
         {
-            finisherHitmarker = false;
+
         }
 
         public void SetClip(AudioClip clip)
         {
-            if(clip == null || _source == null) { return; }
-
             _source.clip = clip;
         }
 
