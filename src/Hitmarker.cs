@@ -85,7 +85,7 @@ namespace NEP.Hitmarkers
 
         private IEnumerator CoHide()
         {
-            yield return new WaitForSeconds(0.85f);
+            yield return new WaitForSeconds(0.95f);
             gameObject.SetActive(false);
         }
     }

@@ -21,8 +21,6 @@ namespace NEP.Hitmarkers
 
         public static List<BehaviourBaseNav> deadNPCs;
 
-        public bool startKill { get; set; }
-
         private int hitmarkerPoolCount = 32;
 
         public static Hitmarker lastHitmarker { get; private set; }
