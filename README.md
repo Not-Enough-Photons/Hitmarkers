@@ -10,6 +10,3 @@ Hitmarkers are bits of visual and audio feedback to let you know that you hit so
 
 # To make custom sounds
 Go to UserData/Hitmarkers/Audio and find the folder of the sounds you want to replace or add. You have the regular hitmarker sound folder and the finisher hitmarker sound folder. Drag any sounds into these folders and you are finished!
-
-## Source code:
-https://github.com/Not-Enough-Photons/Paranoia
