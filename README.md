@@ -1,9 +1,14 @@
-### GENERAL INFORMATION:
+# Hitmarkers
+by Not Enough Photons
 
-- An Example Mod for [MelonLoader](https://github.com/LavaGang/MelonLoader).
+# Description:
+Hitmarkers are bits of visual and audio feedback to let you know that you hit something. Finally, after some testing and a lot of sweating, we have brought that functionality to BONEWORKS.
 
----
+# To Install:
+1.) Drag all files to the root BONEWORKS directory.
 
-### LICENSING & CREDITS:
+# To make custom sounds
+Go to UserData/Hitmarkers/Audio and find the folder of the sounds you want to replace or add. You have the regular hitmarker sound folder and the finisher hitmarker sound folder. Drag any sounds into these folders and you are finished!
 
-TestMod is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/LavaGang/TestMod/blob/master/LICENSE.md) for the full License.
+## Source code:
+https://github.com/Not-Enough-Photons/Paranoia
