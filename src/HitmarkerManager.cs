@@ -19,7 +19,7 @@ namespace NEP.Hitmarkers
         public static List<Hitmarker> regularHitmarkerPool;
         public static List<Hitmarker> finisherHitmarkerPool;
 
-        public List<BehaviourBaseNav> deadNPCs;
+        public static List<BehaviourBaseNav> deadNPCs;
 
         public bool startKill { get; set; }
 
@@ -88,7 +88,7 @@ namespace NEP.Hitmarkers
             AIBrain brain = collider.GetComponentInParent<AIBrain>();
             BehaviourBaseNav navBehaviour = brain.behaviour;
 
-            if(navBehaviour.puppetMaster.isDead) { return; }
+            if(navBehaviour.puppetMaster.isDead || navBehaviour == deadNPCs.FirstOrDefault((npc) => npc == navBehaviour)) { return; }
 
             SpawnHitmarker(navBehaviour.puppetMaster.isKilling, impactWorld);
         }
@@ -137,7 +137,7 @@ namespace NEP.Hitmarkers
     {
         public static void Postfix(BehaviourBaseNav __instance)
         {
-            HitmarkerManager._instance.deadNPCs.Add(__instance);
+            HitmarkerManager.deadNPCs.Add(__instance);
             HitmarkerManager.lastHitmarker.gameObject.SetActive(false);
             HitmarkerManager.SpawnHitmarker(true, HitmarkerManager.lastHitmarker.transform.position);
         }
