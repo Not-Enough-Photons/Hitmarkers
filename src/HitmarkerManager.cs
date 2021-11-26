@@ -23,7 +23,7 @@ namespace NEP.Hitmarkers
 
         private int hitmarkerPoolCount = 32;
 
-        public static Hitmarker lastHitmarker { get; private set; }
+        public static Hitmarker lastHitmarker { get; set; }
 
         private void Awake()
         {
@@ -127,8 +127,13 @@ namespace NEP.Hitmarkers
         public static void Postfix(BehaviourBaseNav __instance)
         {
             HitmarkerManager.deadNPCs.Add(__instance);
-            HitmarkerManager.lastHitmarker.gameObject.SetActive(false);
-            HitmarkerManager.SpawnHitmarker(true, HitmarkerManager.lastHitmarker.transform.position);
+
+            if(HitmarkerManager.lastHitmarker != null)
+            {
+                HitmarkerManager.lastHitmarker.gameObject.SetActive(false);
+                HitmarkerManager.SpawnHitmarker(true, HitmarkerManager.lastHitmarker.transform.position);
+                HitmarkerManager.lastHitmarker = null;
+            }
         }
     }
 }
