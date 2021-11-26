@@ -24,8 +24,6 @@ namespace NEP.Hitmarkers
 
         public static AssetBundle resources;
 
-        private HitmarkerManager manager;
-
         public override void OnApplicationStart()
         {
             hitAudio = new List<AudioClip>();
@@ -38,7 +36,7 @@ namespace NEP.Hitmarkers
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            manager = new GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
+            new GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
         }
 
         public static Object GetObjectFromResources(string name)

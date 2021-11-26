@@ -12,8 +12,6 @@ namespace NEP.Hitmarkers
 
         public Animator animator { get; private set; }
 
-        public MeshRenderer renderer { get; private set; }
-
         public List<AudioClip> hitAudio { get; private set; }
         public List<AudioClip> hitFinisherAudio { get; private set; }
 
@@ -34,7 +32,6 @@ namespace NEP.Hitmarkers
 
             plane.transform.SetParent(transform);
 
-            renderer = plane.GetComponent<MeshRenderer>();
             animator = plane.GetComponent<Animator>();
 
             gameObject.SetActive(false);

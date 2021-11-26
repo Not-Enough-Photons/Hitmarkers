@@ -102,11 +102,6 @@ namespace NEP.Hitmarkers
         {
             hitmarker.transform.position = position;
         }
-
-        private static bool EvaluateHealth(SubBehaviourHealth healthModule)
-        {
-            return healthModule.cur_hp <= 0f;
-        }
     }
 
     [HarmonyLib.HarmonyPatch(typeof(Projectile))]
