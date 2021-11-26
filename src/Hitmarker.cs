@@ -80,7 +80,20 @@ namespace NEP.Hitmarkers
 
         private void Update()
         {
-            transform.LookAt(ModThatIsNotMod.Player.GetPlayerHead().transform);
+            transform.LookAt(GetPlayerHead());
+        }
+
+        // From ModThatIsNotMod
+        private Transform GetPlayerHead()
+        {
+            GameObject rigManager = GameObject.Find("[RigManager (Default Brett)]");
+
+            if (rigManager != null)
+            {
+                return rigManager.transform.Find("[PhysicsRig]/Head/PlayerTrigger");
+            }
+
+            return null;
         }
 
         private IEnumerator CoHide()
