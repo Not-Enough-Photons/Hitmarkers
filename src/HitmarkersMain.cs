@@ -1,5 +1,7 @@
 ﻿using MelonLoader;
 
+using ModThatIsNotMod.BoneMenu;
+
 using UnityEngine;
 
 using System.Collections.Generic;
@@ -24,12 +26,18 @@ namespace NEP.Hitmarkers
 
         public static AssetBundle resources;
 
+        public static bool enableMod { get; set; } = true;
+
         public override void OnApplicationStart()
         {
             hitAudio = new List<AudioClip>();
             hitFinisherAudio = new List<AudioClip>();
 
             resources = AssetBundle.LoadFromFile(MelonUtils.UserDataDirectory + "/Hitmarkers/hm_resources.pack");
+
+            MenuCategory menu = MenuManager.CreateCategory("Hitmarkers", Color.white);
+            menu.CreateBoolElement("Enable Hitmarkers", Color.white, true, (enabled) => enableMod = enabled);
+            menu.CreateFloatElement("Hitmarker Scale", Color.white, 1f, (num) => HitmarkerManager.hitmarkerScale = num, 0.25f, 0.25f, 2f, true);
 
             Audio.AudioUtilities.Intitialize();
         }

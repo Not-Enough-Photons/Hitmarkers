@@ -32,13 +32,15 @@ namespace NEP.Hitmarkers
 
             plane.transform.SetParent(transform);
 
-            animator = plane.GetComponent<Animator>();
+            animator = plane.transform.Find("HM").GetComponent<Animator>();
 
             gameObject.SetActive(false);
         }
 
         private void OnEnable()
         {
+            transform.localScale = Vector3.one * HitmarkerManager.hitmarkerScale;
+
             AudioClip hitAudioClip = hitAudio[Random.Range(0, hitAudio.Count)];
             AudioClip hitFinisherClip = hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
 

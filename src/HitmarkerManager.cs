@@ -16,6 +16,8 @@ namespace NEP.Hitmarkers
 
         public static HitmarkerManager _instance;
 
+        public static float hitmarkerScale = 1f;
+
         public static List<Hitmarker> regularHitmarkerPool;
         public static List<Hitmarker> finisherHitmarkerPool;
 
@@ -77,6 +79,8 @@ namespace NEP.Hitmarkers
 
         public static void OnProjectileCollision(TriggerRefProxy playerProxy, Collider collider, Vector3 impactWorld, Vector3 impactNormal)
         {
+            if (!HitmarkersMain.enableMod) { return; }
+
             if(collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
 
             AIBrain brain = collider.GetComponentInParent<AIBrain>();
@@ -89,6 +93,8 @@ namespace NEP.Hitmarkers
 
         public static void SpawnHitmarker(bool isFinisher, Vector3 position)
         {
+            if (!HitmarkersMain.enableMod) { return; }
+
             Hitmarker hitmarker = isFinisher ? finisherHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active) : regularHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active);
 
             lastHitmarker = hitmarker;
