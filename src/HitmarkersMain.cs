@@ -37,7 +37,8 @@ namespace NEP.Hitmarkers
 
             MenuCategory menu = MenuManager.CreateCategory("Hitmarkers", Color.white);
             menu.CreateBoolElement("Enable Hitmarkers", Color.white, true, (enabled) => enableMod = enabled);
-            menu.CreateFloatElement("Hitmarker Scale", Color.white, 1f, (num) => HitmarkerManager.hitmarkerScale = num, 0.25f, 0.25f, 2f, true);
+            menu.CreateFloatElement("Hitmarker Scale", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerScale = num, 0.25f, 0.25f, 2f, true);
+            menu.CreateFloatElement("Distance Scale", Color.white, 0.25f, (num) => HitmarkerManager._instance.hitmarkerDistanceScale = num, 0.25f, 0.25f, 2f, true);
 
             Audio.AudioUtilities.Intitialize();
         }

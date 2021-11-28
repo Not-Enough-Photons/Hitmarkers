@@ -39,7 +39,14 @@ namespace NEP.Hitmarkers
 
         private void OnEnable()
         {
-            transform.localScale = Vector3.one * HitmarkerManager.hitmarkerScale;
+            float distanceFromShot = HitmarkerManager._instance.distanceFromShot;
+            float distanceScale = HitmarkerManager._instance.hitmarkerDistanceScale;
+            float distanceUntilScale = HitmarkerManager._instance.hitmarkerDistanceUntilScale;
+
+            Vector3 baseScale = Vector3.one * HitmarkerManager._instance.hitmarkerScale;
+            float newDistanceScale = distanceScale * distanceFromShot;
+
+            transform.localScale = distanceUntilScale >= newDistanceScale ? baseScale * newDistanceScale : baseScale;
 
             AudioClip hitAudioClip = hitAudio[Random.Range(0, hitAudio.Count)];
             AudioClip hitFinisherClip = hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
@@ -79,20 +86,7 @@ namespace NEP.Hitmarkers
 
         private void Update()
         {
-            transform.LookAt(GetPlayerHead());
-        }
-
-        // From ModThatIsNotMod
-        private Transform GetPlayerHead()
-        {
-            GameObject rigManager = GameObject.Find("[RigManager (Default Brett)]");
-
-            if (rigManager != null)
-            {
-                return rigManager.transform.Find("[PhysicsRig]/Head/PlayerTrigger");
-            }
-
-            return null;
+            transform.LookAt(HitmarkerManager.GetPlayerHead());
         }
 
         private IEnumerator CoHide()

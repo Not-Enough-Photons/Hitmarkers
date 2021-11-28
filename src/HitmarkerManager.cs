@@ -16,12 +16,16 @@ namespace NEP.Hitmarkers
 
         public static HitmarkerManager _instance;
 
-        public static float hitmarkerScale = 1f;
 
         public static List<Hitmarker> regularHitmarkerPool;
         public static List<Hitmarker> finisherHitmarkerPool;
 
         public static List<BehaviourBaseNav> deadNPCs;
+
+        public float hitmarkerScale = 1f;
+        public float distanceFromShot;
+        public float hitmarkerDistanceScale = 0.25f;
+        public float hitmarkerDistanceUntilScale = 10f;
 
         private int hitmarkerPoolCount = 32;
 
@@ -77,12 +81,28 @@ namespace NEP.Hitmarkers
             }
         }
 
-        public static void OnProjectileCollision(TriggerRefProxy playerProxy, Collider collider, Vector3 impactWorld, Vector3 impactNormal)
+        // From ModThatIsNotMod
+        public static Transform GetPlayerHead()
+        {
+            GameObject rigManager = GameObject.Find("[RigManager (Default Brett)]");
+
+            if (rigManager != null)
+            {
+                return rigManager.transform.Find("[PhysicsRig]/Head/PlayerTrigger");
+            }
+
+            return null;
+        }
+
+        public void OnProjectileCollision(TriggerRefProxy playerProxy, Collider collider, Vector3 impactWorld, Vector3 impactNormal)
         {
             if (!HitmarkersMain.enableMod) { return; }
 
+            distanceFromShot = (impactWorld - GetPlayerHead().position).magnitude;
+
             Transform playerRepRoot = collider.transform.root;
 
+            // Simple Entanglement support
             if (playerRepRoot.name.StartsWith("PlayerRep") && playerRepRoot.gameObject.layer == LayerMask.NameToLayer("Dynamic"))
             {
                 SpawnHitmarker(false, impactWorld);
@@ -131,7 +151,7 @@ namespace NEP.Hitmarkers
                 (((Collider collider, Vector3 world, Vector3 normal)
                 =>
                 {
-                    HitmarkerManager.OnProjectileCollision(__instance._proxy, collider, world, normal);
+                    HitmarkerManager._instance.OnProjectileCollision(__instance._proxy, collider, world, normal);
                 })));
         }
     }
