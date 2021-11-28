@@ -81,9 +81,19 @@ namespace NEP.Hitmarkers
         {
             if (!HitmarkersMain.enableMod) { return; }
 
+            Transform playerRepRoot = collider.transform.root;
+
+            if (playerRepRoot.name.StartsWith("PlayerRep") && playerRepRoot.gameObject.layer == LayerMask.NameToLayer("Dynamic"))
+            {
+                SpawnHitmarker(false, impactWorld);
+            }
+
             if(collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
 
             AIBrain brain = collider.GetComponentInParent<AIBrain>();
+
+            if(brain == null) { return; }
+
             BehaviourBaseNav navBehaviour = brain.behaviour;
 
             if(navBehaviour.puppetMaster.isDead || navBehaviour == deadNPCs.FirstOrDefault((npc) => npc == navBehaviour)) { return; }
