@@ -46,7 +46,7 @@ namespace NEP.Hitmarkers
             Vector3 baseScale = Vector3.one * HitmarkerManager._instance.hitmarkerScale;
             float newDistanceScale = distanceScale * distanceFromShot;
 
-            transform.localScale = distanceUntilScale >= newDistanceScale ? baseScale * newDistanceScale : baseScale;
+            transform.localScale = distanceFromShot >= distanceUntilScale ? baseScale * newDistanceScale : baseScale;
 
             AudioClip hitAudioClip = hitAudio[Random.Range(0, hitAudio.Count)];
             AudioClip hitFinisherClip = hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
