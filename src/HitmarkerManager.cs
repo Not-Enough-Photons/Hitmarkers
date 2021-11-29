@@ -16,7 +16,6 @@ namespace NEP.Hitmarkers
 
         public static HitmarkerManager _instance;
 
-
         public static List<Hitmarker> regularHitmarkerPool;
         public static List<Hitmarker> finisherHitmarkerPool;
 
@@ -24,7 +23,7 @@ namespace NEP.Hitmarkers
 
         public float hitmarkerScale = 1f;
         public float distanceFromShot;
-        public float hitmarkerDistanceScale = 0.25f;
+        public float hitmarkerDistanceScale = 0.15f;
         public float hitmarkerDistanceUntilScale = 10f;
 
         private int hitmarkerPoolCount = 32;
