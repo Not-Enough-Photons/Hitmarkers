@@ -115,13 +115,8 @@ namespace NEP.Hitmarkers
         {
             Transform playerRepRoot = collider.transform.root;
 
-            /*if (proxy.transform.root.name.StartsWith("PlayerRep"))
-            {
-                return;
-            }*/
-
             // Simple Entanglement support
-            if (playerRepRoot.name.StartsWith("PlayerRep") && playerRepRoot.gameObject.layer == LayerMask.NameToLayer("Dynamic"))
+            if (playerRepRoot.name.StartsWith("PlayerRep"))
             {
                 SpawnHitmarker(false, impactWorld);
             }
