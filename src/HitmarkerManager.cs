@@ -20,6 +20,7 @@ namespace NEP.Hitmarkers
         public static List<Hitmarker> finisherHitmarkerPool;
 
         public static List<BehaviourBaseNav> deadNPCs;
+        public static Enemy_Turret lastDeadTurret;
 
         public float hitmarkerScale = 1f;
         public float distanceFromShot;
@@ -99,23 +100,38 @@ namespace NEP.Hitmarkers
 
             distanceFromShot = (impactWorld - GetPlayerHead().position).magnitude;
 
+            if(collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
+            //if (playerProxy.root.name != "[RigManager (Default Brett)]") { return; }
+
+            EvaluateEntanglementPlayer(playerProxy, collider, impactWorld);
+            EvaluateNPC(collider, impactWorld);
+        }
+
+        private void EvaluateEntanglementPlayer(TriggerRefProxy proxy, Collider collider, Vector3 impactWorld)
+        {
             Transform playerRepRoot = collider.transform.root;
+
+            /*if (proxy.transform.root.name.StartsWith("PlayerRep"))
+            {
+                return;
+            }*/
 
             // Simple Entanglement support
             if (playerRepRoot.name.StartsWith("PlayerRep") && playerRepRoot.gameObject.layer == LayerMask.NameToLayer("Dynamic"))
             {
                 SpawnHitmarker(false, impactWorld);
             }
+        }
 
-            if(collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
-
+        private void EvaluateNPC(Collider collider, Vector3 impactWorld)
+        {
             AIBrain brain = collider.GetComponentInParent<AIBrain>();
 
-            if(brain == null) { return; }
+            if (brain == null) { return; }
 
             BehaviourBaseNav navBehaviour = brain.behaviour;
 
-            if(navBehaviour.puppetMaster.isDead || navBehaviour == deadNPCs.FirstOrDefault((npc) => npc == navBehaviour)) { return; }
+            if (navBehaviour.puppetMaster.isDead || navBehaviour == deadNPCs.FirstOrDefault((npc) => npc == navBehaviour)) { return; }
 
             SpawnHitmarker(navBehaviour.puppetMaster.isKilling, impactWorld);
         }
