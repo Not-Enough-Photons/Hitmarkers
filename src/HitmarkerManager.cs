@@ -98,13 +98,17 @@ namespace NEP.Hitmarkers
         {
             if (!HitmarkersMain.enableMod) { return; }
 
-            distanceFromShot = (impactWorld - GetPlayerHead().position).magnitude;
+            try
+            {
+                distanceFromShot = (impactWorld - GetPlayerHead().position).magnitude;
 
-            if(collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
-            //if (playerProxy.root.name != "[RigManager (Default Brett)]") { return; }
+                if (collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
+                //if (playerProxy.root.name != "[RigManager (Default Brett)]") { return; }
 
-            EvaluateEntanglementPlayer(playerProxy, collider, impactWorld);
-            EvaluateNPC(collider, impactWorld);
+                EvaluateEntanglementPlayer(playerProxy, collider, impactWorld);
+                EvaluateNPC(collider, impactWorld);
+            }
+            catch { }
         }
 
         private void EvaluateEntanglementPlayer(TriggerRefProxy proxy, Collider collider, Vector3 impactWorld)
