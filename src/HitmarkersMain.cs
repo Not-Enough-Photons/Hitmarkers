@@ -46,7 +46,7 @@ namespace NEP.Hitmarkers
             sub_Visuals.CreateFloatElement("Distance Until Scale", Color.white, 5, (num) => HitmarkerManager._instance.hitmarkerDistanceUntilScale = num, 1, 1, float.PositiveInfinity, true);
             sub_Visuals.CreateFloatElement("Animation Speed", Color.white, 1f, (num) => HitmarkerManager._instance.animationSpeed = num, 0.25f, 0.25f, 2f, true);
 
-            sub_Audio.CreateFloatElement("Volume", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerAudio = num, 0.25f, 0f, 2f, true);
+            sub_Audio.CreateFloatElement("Volume", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerAudio = num, 0.25f, 0f, 3f, true);
 
             Audio.AudioUtilities.Intitialize();
         }
