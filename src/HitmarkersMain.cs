@@ -36,10 +36,18 @@ namespace NEP.Hitmarkers
             resources = AssetBundle.LoadFromFile(MelonUtils.UserDataDirectory + "/Hitmarkers/hm_resources.pack");
 
             MenuCategory menu = MenuManager.CreateCategory("Hitmarkers", Color.white);
+            MenuCategory sub_Visuals = menu.CreateSubCategory("Visuals", Color.white);
+            MenuCategory sub_Audio = menu.CreateSubCategory("Audio", Color.white);
+
             menu.CreateBoolElement("Enable Hitmarkers", Color.white, true, (enabled) => enableMod = enabled);
-            menu.CreateFloatElement("Hitmarker Scale", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerScale = num, 0.25f, 0.25f, 2f, true);
-            menu.CreateFloatElement("Distance Scale", Color.white, 0.15f, (num) => HitmarkerManager._instance.hitmarkerDistanceScale = num, 0.05f, 0.05f, 1f, true);
-            menu.CreateFloatElement("Distance Until Scale", Color.white, 5, (num) => HitmarkerManager._instance.hitmarkerDistanceUntilScale = num, 1, 1, float.PositiveInfinity, true);
+
+            sub_Visuals.CreateFloatElement("Hitmarker Scale", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerScale = num, 0.25f, 0.25f, 2f, true);
+            sub_Visuals.CreateFloatElement("Distance Scale", Color.white, 0.15f, (num) => HitmarkerManager._instance.hitmarkerDistanceScale = num, 0.05f, 0.05f, 1f, true);
+            sub_Visuals.CreateFloatElement("Distance Until Scale", Color.white, 5, (num) => HitmarkerManager._instance.hitmarkerDistanceUntilScale = num, 1, 1, float.PositiveInfinity, true);
+            sub_Visuals.CreateFloatElement("Animation Speed", Color.white, 1f, (num) => HitmarkerManager._instance.animationSpeed = num, 0.25f, 0.25f, 2f, true);
+            sub_Visuals.CreateBoolElement("Show Death Skull", Color.white, false, (cond) => HitmarkerManager._instance.useDeathSkull = cond);
+
+            sub_Audio.CreateFloatElement("Volume", Color.white, 1f, (num) => HitmarkerManager._instance.hitmarkerAudio = num, 0.25f, 0f, 2f, true);
 
             Audio.AudioUtilities.Intitialize();
         }

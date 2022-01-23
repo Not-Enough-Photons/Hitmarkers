@@ -26,6 +26,11 @@ namespace NEP.Hitmarkers
         public float distanceFromShot;
         public float hitmarkerDistanceScale = 0.15f;
         public float hitmarkerDistanceUntilScale = 10f;
+        public float hitmarkerAudio = 1f;
+        public float animationSpeed = 1f;
+        public bool useDeathSkull;
+        public Color hitmarkerColor;
+        public Color hitmarkerSkullColor;
 
         private int hitmarkerPoolCount = 32;
 
@@ -46,6 +51,8 @@ namespace NEP.Hitmarkers
             HitmarkerManager.regularHitmarkerPool = new List<Hitmarker>();
             HitmarkerManager.finisherHitmarkerPool = new List<Hitmarker>();
             deadNPCs = new List<BehaviourBaseNav>();
+
+            new GameObject("Hitmarker Audio").AddComponent<Audio.HitmarkerAudio>();
 
             Transform regularHitmarkerPool = new GameObject("Regular Hitmarker Pool").transform;
             Transform finisherHitmarkerPool = new GameObject("Finisher Hitmarker Pool").transform;

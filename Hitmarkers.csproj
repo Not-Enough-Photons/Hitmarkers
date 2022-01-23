@@ -31,8 +31,8 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\Steam Games\steamapps\common\BONEWORKS\BONEWORKS\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Bass.Net">
-      <HintPath>C:\Users\Adam\Desktop\Bass.Net.dll</HintPath>
+    <Reference Include="AudioImportLib">
+      <HintPath>..\Boneworks Assemblies\AudioImportLib.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>E:\Steam Games\steamapps\common\BONEWORKS\BONEWORKS\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
@@ -73,6 +73,10 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Steam Games\steamapps\common\BONEWORKS\BONEWORKS\MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\Steam Games\steamapps\common\BONEWORKS\BONEWORKS\MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>E:\Steam Games\steamapps\common\BONEWORKS\BONEWORKS\MelonLoader\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
@@ -83,12 +87,12 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Audio\AudioUtilities.cs" />
-    <Compile Include="src\Audio\BassNet\AudioImporter.cs" />
-    <Compile Include="src\Audio\BassNet\BassImporter.cs" />
-    <Compile Include="src\Audio\BassNet\DecoderImporter.cs" />
+    <Compile Include="src\Audio\HitmarkerAudio.cs" />
+    <Compile Include="src\Audio\PooledAudio.cs" />
     <Compile Include="src\Hitmarker.cs" />
     <Compile Include="src\HitmarkerManager.cs" />
     <Compile Include="src\HitmarkersMain.cs" />
+    <Compile Include="src\Utilities\Utilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
