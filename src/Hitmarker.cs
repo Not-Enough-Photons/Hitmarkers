@@ -133,7 +133,7 @@ namespace NEP.Hitmarkers
 
         private IEnumerator CoHide()
         {
-            yield return new WaitForSeconds(HitmarkerManager._instance.animationSpeed * 10f);
+            yield return new WaitForSeconds(3f);
             gameObject.SetActive(false);
         }
     }
