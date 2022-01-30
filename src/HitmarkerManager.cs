@@ -113,9 +113,17 @@ namespace NEP.Hitmarkers
                 //if (playerProxy.root.name != "[RigManager (Default Brett)]") { return; }
 
                 EvaluateEntanglementPlayer(playerProxy, collider, impactWorld);
-                EvaluateNPC(collider, impactWorld);
+                EvaluateNPC(collider.transform, impactWorld);
             }
             catch { }
+        }
+
+        public void OnStabJointCreated(StabSlash.StabPoint stabPoint, ConfigurableJoint joint)
+        {
+            if(stabPoint.stabJoints[0] != null)
+            {
+                EvaluateNPC(stabPoint.stabJoints[0].collider.transform, stabPoint.pointTran.position);
+            }
         }
 
         private void EvaluateEntanglementPlayer(TriggerRefProxy proxy, Collider collider, Vector3 impactWorld)
@@ -129,9 +137,10 @@ namespace NEP.Hitmarkers
             }
         }
 
-        private void EvaluateNPC(Collider collider, Vector3 impactWorld)
+        private void EvaluateNPC(Transform transform, Vector3 impactWorld)
         {
-            AIBrain brain = collider.GetComponentInParent<AIBrain>();
+            MelonLoader.MelonLogger.Msg(transform.name);
+            AIBrain brain = transform.GetComponentInParent<AIBrain>();
 
             if (brain == null) { return; }
 
@@ -158,6 +167,16 @@ namespace NEP.Hitmarkers
         private static void SetupHitmarker(Hitmarker hitmarker, Vector3 position)
         {
             hitmarker.transform.position = position;
+        }
+    }
+
+    [HarmonyLib.HarmonyPatch(typeof(StabSlash.StabPoint))]
+    [HarmonyLib.HarmonyPatch(nameof(StabSlash.StabPoint.JointSetup))]
+    public static class StabPatch
+    {
+        public static void Postfix(StabSlash.StabPoint __instance, ConfigurableJoint j)
+        {
+            HitmarkerManager._instance.OnStabJointCreated(__instance, j);
         }
     }
 
