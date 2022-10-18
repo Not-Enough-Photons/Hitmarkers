@@ -9,8 +9,8 @@ namespace NEP.Hitmarkers.Audio
 {
     public static class AudioUtilities
     {
-		public static string hitmarkerDir = MelonLoader.MelonUtils.UserDataDirectory + "/Hitmarkers/Audio/Hitmarkers";
-		public static string hitmarkerFinisherDir = MelonLoader.MelonUtils.UserDataDirectory + "/Hitmarkers/Audio/Finishers";
+		public static string hitmarkerDir = MelonLoader.MelonUtils.UserDataDirectory + "Not Enough Photons/Hitmarkers/Audio/Hitmarkers";
+		public static string hitmarkerFinisherDir = MelonLoader.MelonUtils.UserDataDirectory + "Not Enough Photons/Hitmarkers/Audio/Finishers";
 
 		public static void Intitialize()
         {

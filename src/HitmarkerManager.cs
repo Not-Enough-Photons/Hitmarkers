@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using StressLevelZero.AI;
-using StressLevelZero.Combat;
+using SLZ.AI;
+using SLZ.Combat;
 using PuppetMasta;
 
 using System.Collections.Generic;
@@ -75,6 +75,8 @@ namespace NEP.Hitmarkers
                 hitmarker.UseFinisherHitmarker(true);
                 HitmarkerManager.finisherHitmarkerPool.Add(hitmarker);
             }
+
+            Utilities.HealthPatch.OnTakeDamage += EvaluateNPCHealth;
         }
 
         private void Update()
@@ -91,14 +93,44 @@ namespace NEP.Hitmarkers
         // From ModThatIsNotMod
         public static Transform GetPlayerHead()
         {
-            GameObject rigManager = GameObject.Find("[RigManager (Default Brett)]");
+            SLZ.Rig.RigManager rigManager = FindObjectOfType<SLZ.Rig.RigManager>();
+            GameObject rmGo = rigManager.gameObject;
 
             if (rigManager != null)
             {
-                return rigManager.transform.Find("[PhysicsRig]/Head/PlayerTrigger");
+                return rigManager.physicsRig.m_head;
             }
 
             return null;
+        }
+
+        public void EvaluateNPCHealth(int m, Attack attack)
+        {
+            if(attack.damage < 0.25f)
+            {
+                return;
+            }
+
+            AIBrain brain = attack.collider.GetComponentInParent<AIBrain>();
+
+            if (brain)
+            {
+                var health = brain.behaviour.health.cur_hp;
+
+                if(health <= 0f)
+                {
+                    return;
+                }
+
+                if(health - attack.damage <= 0f)
+                {
+                    SpawnHitmarker(true, attack.origin);
+                }
+                else
+                {
+                    SpawnHitmarker(false, attack.origin);
+                }
+            }
         }
 
         public void OnProjectileCollision(TriggerRefProxy playerProxy, Collider collider, Vector3 impactWorld, Vector3 impactNormal)
@@ -118,14 +150,6 @@ namespace NEP.Hitmarkers
             catch { }
         }
 
-        public void OnStabJointCreated(StabSlash.StabPoint stabPoint, ConfigurableJoint joint)
-        {
-            if(stabPoint.stabJoints[0] != null)
-            {
-                EvaluateNPC(stabPoint.stabJoints[0].collider.transform, stabPoint.pointTran.position);
-            }
-        }
-
         private void EvaluateEntanglementPlayer(TriggerRefProxy proxy, Collider collider, Vector3 impactWorld)
         {
             Transform playerRepRoot = collider.transform.root;
@@ -139,7 +163,6 @@ namespace NEP.Hitmarkers
 
         private void EvaluateNPC(Transform transform, Vector3 impactWorld)
         {
-            MelonLoader.MelonLogger.Msg(transform.name);
             AIBrain brain = transform.GetComponentInParent<AIBrain>();
 
             if (brain == null) { return; }
@@ -166,17 +189,12 @@ namespace NEP.Hitmarkers
 
         private static void SetupHitmarker(Hitmarker hitmarker, Vector3 position)
         {
-            hitmarker.transform.position = position;
-        }
-    }
+            if(hitmarker == null)
+            {
+                return;
+            }
 
-    [HarmonyLib.HarmonyPatch(typeof(StabSlash.StabPoint))]
-    [HarmonyLib.HarmonyPatch(nameof(StabSlash.StabPoint.JointSetup))]
-    public static class StabPatch
-    {
-        public static void Postfix(StabSlash.StabPoint __instance, ConfigurableJoint j)
-        {
-            HitmarkerManager._instance.OnStabJointCreated(__instance, j);
+            hitmarker.transform.position = position;
         }
     }
 
