@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 
-using System.Collections;
-using System.Collections.Generic;
-
-using NEP.Hitmarkers.Utilities;
+using NEP.Hitmarkers.Data;
 
 namespace NEP.Hitmarkers
 {
@@ -12,129 +9,71 @@ namespace NEP.Hitmarkers
     {
         public Hitmarker(System.IntPtr ptr) : base(ptr) { }
 
-        public Animator animator { get; private set; }
+        public AudioClip[] HitAudio
+        {
+            get => _hitAudio;
+        }
 
-        public List<AudioClip> hitAudio { get; private set; }
-        public List<AudioClip> hitFinisherAudio { get; private set; }
+        public AudioClip[] FinisherAudio
+        {
+            get => _finisherAudio;
+        }
 
-        public AudioSource source { get; private set; }
-        public GameObject deathSkullGO { get; private set; }
+        public bool IsFinisher
+        {
+            get => _isFinisher;
+            set => _isFinisher = value;
+        }
 
-        public bool finisherHitmarker;
+        private bool _isFinisher;
 
-        private Texture2D crossTexture;
-        private Texture2D skullTexture;
+        private AudioClip[] _hitAudio;
+        private AudioClip[] _finisherAudio;
 
-        private AnimationClip hm_appear1;
-        private AnimationClip hm_appear2;
-        private AnimationClip hm_finisher_appear1;
+        private Animator _markerAnimator;
+        private Animator _finisherAnimator;
 
-        private Material crossMaterial;
-        private Material skullMaterial;
+        private GameObject _markerObject;
+        private GameObject _finisherObject;
 
         private void Awake()
         {
-            hitAudio = HitmarkersMain.hitAudio;
-            hitFinisherAudio = HitmarkersMain.hitFinisherAudio;
+            _hitAudio = DataManager.HitClips;
+            _finisherAudio = DataManager.HitClips;
+        }
 
-            AudioSource source = gameObject.AddComponent<AudioSource>();
-            source.playOnAwake = true;
-            this.source = source;
+        private void Start()
+        {
+            _markerObject = transform.Find("Marker").gameObject;
+            _finisherObject = transform.Find("Finisher").gameObject;
 
-            GameObject plane = Instantiate(HitmarkersMain.resources.LoadAsset("BaseHitmarker").Cast<GameObject>());
+            _markerAnimator = _markerObject.GetComponent<Animator>();
+            _finisherAnimator = _finisherObject.GetComponent<Animator>();
 
-            hm_appear1 = HitmarkersMain.resources.LoadAsset("hm_appear1").Cast<AnimationClip>();
-            hm_appear2 = HitmarkersMain.resources.LoadAsset("hm_appear2").Cast<AnimationClip>();
-            hm_finisher_appear1 = HitmarkersMain.resources.LoadAsset("hm_finisher_appear1").Cast<AnimationClip>();
-
-            plane.transform.SetParent(transform);
-
-            animator = plane.transform.Find("HM").GetComponent<Animator>();
-
-            deathSkullGO = plane.transform.Find("HM/DeathSkull").gameObject;
-            deathSkullGO.SetActive(false);
-
-            crossMaterial = plane.transform.Find("HM").GetComponent<MeshRenderer>().material;
-            skullMaterial = plane.transform.Find("HM/DeathSkull").GetComponent<MeshRenderer>().material;
-
-            crossTexture = Utilities.Utilities.LoadFromFile(Utilities.Utilities.textureDir + "cross.png");
-            skullTexture = Utilities.Utilities.LoadFromFile(Utilities.Utilities.textureDir + "finisher.png");
-
-            crossMaterial.mainTexture = crossTexture;
-            skullMaterial.mainTexture = skullTexture;
-
-            gameObject.SetActive(false);
+            _markerObject.SetActive(false);
+            _finisherObject.SetActive(false);
         }
 
         private void OnEnable()
         {
-            float distanceFromShot = HitmarkerManager._instance.distanceFromShot;
-            float distanceScale = HitmarkerManager._instance.hitmarkerDistanceScale;
-            float distanceUntilScale = HitmarkerManager._instance.hitmarkerDistanceUntilScale;
-            float hitmarkerAudio = HitmarkerManager._instance.hitmarkerAudio;
-            float animationSpeed = HitmarkerManager._instance.animationSpeed;
-
-            Vector3 baseScale = Vector3.one * HitmarkerManager._instance.hitmarkerScale;
-            float newDistanceScale = distanceScale * distanceFromShot;
-
-            transform.localScale = distanceFromShot >= distanceUntilScale ? baseScale * newDistanceScale : baseScale;
-
-            AudioClip hitAudioClip = Audio.HitmarkerAudio.hitAudio[Random.Range(0, hitAudio.Count)];
-            AudioClip hitFinisherClip = Audio.HitmarkerAudio.hitFinisherAudio[Random.Range(0, hitFinisherAudio.Count)];
-
-            source.volume = hitmarkerAudio;
-
-            animator.speed = animationSpeed;
-
-            if (finisherHitmarker)
-            {
-                Audio.HitmarkerAudio.PlayAtPoint(hitFinisherClip, transform.position);
-                animator.Play("hm_finisher_appear1");
-                
-            }
-            else
-            {
-                deathSkullGO.SetActive(false);
-                Audio.HitmarkerAudio.PlayAtPoint(hitAudioClip, transform.position);
-                PlayRandomAnim();
-            }
-
-            MelonLoader.MelonCoroutines.Start(CoHide());
+            PlayAnimation();
+            PlayAudio();
         }
 
-        public void UseFinisherHitmarker(bool use)
+        private void PlayAnimation()
         {
-            finisherHitmarker = use;
-        }
-
-        private void PlayRandomAnim()
-        {
+            var animator = !_isFinisher ? _markerAnimator : _finisherAnimator;
             int rand = Random.Range(0, 2);
 
-            if(rand == 0)
-            {
-                animator.Play("hm_appear1");
-            }
-            else
-            {
-                animator.Play("hm_appear2");
-            }
+            animator.Play($"appear{rand}");
         }
 
-        private void Update()
+        private void PlayAudio()
         {
-            if (finisherHitmarker)
-            {
-                deathSkullGO.SetActive(HitmarkerManager._instance.useDeathSkull);
-            }
+            var selectedList = !_isFinisher ? _hitAudio : _finisherAudio;
+            AudioClip clip = selectedList[Random.Range(0, selectedList.Length)];
 
-            transform.LookAt(HitmarkerManager.GetPlayerHead());
-        }
-
-        private IEnumerator CoHide()
-        {
-            yield return new WaitForSeconds(3f);
-            gameObject.SetActive(false);
+            AudioSource.PlayClipAtPoint(clip, transform.position);
         }
     }
 }
