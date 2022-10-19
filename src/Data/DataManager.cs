@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+using AudioImportLib;
+
 using System.IO;
 using System.Collections.Generic;
 
@@ -47,6 +49,7 @@ namespace NEP.Hitmarkers.Data
         static readonly string path_Mod = path_Developer + "/Hitmarkers";
 
         static readonly string path_Resources = path_Mod + "/resources.pack";
+        static readonly string path_Audio = path_Mod + "/Audio";
         static readonly string path_Textures = path_Mod + "/Textures";
 
         static AssetBundle _bundle;
@@ -91,6 +94,7 @@ namespace NEP.Hitmarkers.Data
         {
             Directory.CreateDirectory(path_Mod);
             Directory.CreateDirectory(path_Textures);
+            Directory.CreateDirectory(path_Audio);
         }
 
         static void GetGameObjects()
@@ -123,23 +127,21 @@ namespace NEP.Hitmarkers.Data
 
         static void GetAudio()
         {
-            foreach (var obj in _bundleObjects)
+            foreach(var file in Directory.GetFiles(path_Audio))
             {
-                var go = obj.TryCast<AudioClip>();
+                string newName = file.Substring(path_Audio.Length + 1);
+                MelonLoader.Melon<Main>.Logger.Msg($"Loading Clip {newName}...");
 
-                if (go != null)
+                if (newName.StartsWith("marker_"))
                 {
-                    go.hideFlags = HideFlags.DontUnloadUnusedAsset;
-
-                    if (go.name.StartsWith("marker"))
-                    {
-                        _clipHitmarkers.Add(go);
-                    }
-                    else if (go.name.StartsWith("finisher"))
-                    {
-                        _clipFinishers.Add(go);
-                    }
+                    _clipHitmarkers.Add(API.LoadAudioClip(file));
                 }
+                else if (newName.StartsWith("finisher_"))
+                {
+                    _clipFinishers.Add(API.LoadAudioClip(file));
+                }
+
+                MelonLoader.Melon<Main>.Logger.Msg($"Successfully Loaded {newName}!");
             }
         }
 
@@ -147,13 +149,14 @@ namespace NEP.Hitmarkers.Data
         {
             foreach (var file in Directory.GetFiles(path_Textures))
             {
-                MelonLoader.Melon<Main>.Logger.Msg($"Loading Texture {file}...");
+                string newName = file.Substring(path_Textures.Length + 1);
+                MelonLoader.Melon<Main>.Logger.Msg($"Loading Texture {newName}...");
 
                 Texture2D texture = new Texture2D(2, 2);
 
                 if (!File.Exists(file))
                 {
-                    MelonLoader.Melon<Main>.Logger.Warning($"Couldn't load {file}! Going to use a white square instead.");
+                    MelonLoader.Melon<Main>.Logger.Warning($"Couldn't load {newName}! Going to use a white square instead.");
                 }
                 else
                 {
@@ -162,7 +165,7 @@ namespace NEP.Hitmarkers.Data
                 }
 
                 texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                texture.name = file.Substring(path_Textures.Length + 1);
+                texture.name = newName;
 
                 MelonLoader.Melon<Main>.Logger.Msg($"Successfully loaded {texture.name}!");
                 _textures.Add(texture);

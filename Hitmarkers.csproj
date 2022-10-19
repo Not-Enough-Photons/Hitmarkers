@@ -47,6 +47,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="AudioImportLib">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\AudioImportLib.dll</HintPath>
+    </Reference>
     <Reference Include="BoneLib">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\BoneLib.dll</HintPath>
     </Reference>
