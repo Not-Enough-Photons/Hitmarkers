@@ -14,6 +14,8 @@ namespace NEP.Hitmarkers
     {
         public HitmarkerManager(System.IntPtr ptr) : base(ptr) { }
 
+        public static HitmarkerManager Instance;
+
         private List<Hitmarker> _hitmarkers;
         private List<Hitmarker> _finishers;
 
@@ -24,15 +26,22 @@ namespace NEP.Hitmarkers
 
         private void Awake()
         {
+            if(Instance == null)
+            {
+                Instance = this;
+            }
+
+            DontDestroyOnLoad(Instance);
+
             BuildPools();
 
-            _hitmarkers = new List<Hitmarker>(_markerCount);
-            _finishers = new List<Hitmarker>(_markerCount);
+            _hitmarkers = new List<Hitmarker>();
+            _finishers = new List<Hitmarker>();
 
             for(int i = 0; i < _markerCount; i++)
             {
-                _hitmarkers[i] = BuildHitmarker(isFinisher: false);
-                _finishers[i] = BuildHitmarker(isFinisher: true);
+                _hitmarkers.Add(BuildHitmarker(isFinisher: false));
+                _finishers.Add(BuildHitmarker(isFinisher: true));
             }
         }
 
@@ -48,11 +57,15 @@ namespace NEP.Hitmarkers
         private Hitmarker BuildHitmarker(bool isFinisher)
         {
             string name = !isFinisher ? "Hitmarker" : "Finisher";
-            GameObject marker = new GameObject(name);
+            GameObject marker = GameObject.Instantiate(Data.DataManager.GetGameObject("Hitmarker"));
 
+            marker.name = name;
             marker.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
             marker.transform.parent = !isFinisher ? _poolHitmarker : _poolFinisher;
+
+            // stops the loudest noise i've ever heard
+            marker.gameObject.SetActive(false);
 
             return marker.AddComponent<Hitmarker>();
         }
@@ -63,7 +76,7 @@ namespace NEP.Hitmarkers
 
             for(int i = 0; i < list.Count; i++)
             {
-                if (!list[i].gameObject.active)
+                if (!list[i].gameObject.activeInHierarchy)
                 {
                     return list[i];
                 }
@@ -72,9 +85,10 @@ namespace NEP.Hitmarkers
             return null;
         }
 
-        public static void SpawnMarker(Vector3 position, bool finisher = false)
+        public void SpawnMarker(Vector3 position, bool finisher = false)
         {
             Hitmarker marker = GetInactiveMarker(finisher);
+            marker.IsFinisher = finisher;
             marker.transform.position = position;
             marker.gameObject.SetActive(true);
         }

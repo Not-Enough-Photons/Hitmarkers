@@ -32,11 +32,11 @@
     <Compile Include="src\Audio\HitmarkerAudio.cs" />
     <Compile Include="src\Audio\PooledAudio.cs" />
     <Compile Include="src\Data\DataManager.cs" />
+    <Compile Include="src\HitData.cs" />
     <Compile Include="src\HitDirector.cs" />
     <Compile Include="src\Hitmarker.cs" />
     <Compile Include="src\HitmarkerManager.cs" />
     <Compile Include="src\Main.cs" />
-    <Compile Include="src\Utilities\Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -50,6 +50,9 @@
     <Reference Include="AudioImportLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\AudioImportLib.dll</HintPath>
+    </Reference>
+    <Reference Include="BoneLib">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\BoneLib.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

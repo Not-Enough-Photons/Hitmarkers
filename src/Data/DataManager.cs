@@ -44,10 +44,6 @@ namespace NEP.Hitmarkers.Data
         static readonly string path_Mod = path_Developer + "/Hitmarkers";
 
         static readonly string path_Resources = path_Mod + "/hm_resources.pack";
-        static readonly string path_Audio = path_Mod + "/Audio";
-
-        static readonly string subpath_Hit_Audio = path_Audio + "/Hitmarkers";
-        static readonly string subpath_Finisher_Audio = path_Audio + "/Finishers";
 
         static AssetBundle _bundle;
         static Object[] _bundleObjects;
@@ -72,6 +68,7 @@ namespace NEP.Hitmarkers.Data
             GetGameObjects();
             GetAnimations();
             GetAudio();
+            return;
         }
 
         public static GameObject GetGameObject(string name)
@@ -82,10 +79,6 @@ namespace NEP.Hitmarkers.Data
         static void GenerateFolders()
         {
             Directory.CreateDirectory(path_Mod);
-            Directory.CreateDirectory(path_Audio);
-
-            Directory.CreateDirectory(subpath_Hit_Audio);
-            Directory.CreateDirectory(subpath_Finisher_Audio);
         }
 
         static void GetGameObjects()
@@ -118,14 +111,23 @@ namespace NEP.Hitmarkers.Data
 
         static void GetAudio()
         {
-            foreach(var file in Directory.GetFiles(subpath_Hit_Audio))
+            foreach (var obj in _bundleObjects)
             {
-                _clipHitmarkers.Add(API.LoadAudioClip(file, true));
-            }
+                var go = obj.TryCast<AudioClip>();
 
-            foreach(var file in Directory.GetFiles(subpath_Finisher_Audio))
-            {
-                _clipFinishers.Add(API.LoadAudioClip(file, true));
+                if (go != null)
+                {
+                    go.hideFlags = HideFlags.DontUnloadUnusedAsset;
+
+                    if (go.name.StartsWith("marker"))
+                    {
+                        _clipHitmarkers.Add(go);
+                    }
+                    else if (go.name.StartsWith("finisher"))
+                    {
+                        _clipFinishers.Add(go);
+                    }
+                }
             }
         }
     }

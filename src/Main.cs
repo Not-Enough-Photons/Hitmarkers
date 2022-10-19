@@ -1,4 +1,7 @@
 ﻿using MelonLoader;
+using BoneLib;
+
+using SLZ.Marrow.Utilities;
 
 namespace NEP.Hitmarkers
 {
@@ -17,11 +20,14 @@ namespace NEP.Hitmarkers
         public override void OnInitializeMelon()
         {
             Data.DataManager.Initialize();
+            MarrowGame.RegisterOnReadyAction(new System.Action(() => OnMarrowGameStart()));
         }
 
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        public void OnMarrowGameStart()
         {
             new UnityEngine.GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
+            new UnityEngine.GameObject("Hitmarker Audio").AddComponent<Audio.HitmarkerAudio>();
+            HitDirector.Initialize();
         }
     }
 }

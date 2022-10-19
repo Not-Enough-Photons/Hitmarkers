@@ -36,19 +36,23 @@ namespace NEP.Hitmarkers
         private GameObject _markerObject;
         private GameObject _finisherObject;
 
+        private AudioSource _source;
+
+        private float _timerHide = 0f;
+        private float _timeUntilHide = 1f;
+
         private void Awake()
         {
             _hitAudio = DataManager.HitClips;
-            _finisherAudio = DataManager.HitClips;
-        }
+            _finisherAudio = DataManager.FinisherClips;
 
-        private void Start()
-        {
             _markerObject = transform.Find("Marker").gameObject;
             _finisherObject = transform.Find("Finisher").gameObject;
 
             _markerAnimator = _markerObject.GetComponent<Animator>();
             _finisherAnimator = _finisherObject.GetComponent<Animator>();
+
+            _source = transform.Find("Source").GetComponent<AudioSource>();
 
             _markerObject.SetActive(false);
             _finisherObject.SetActive(false);
@@ -62,10 +66,38 @@ namespace NEP.Hitmarkers
 
         private void PlayAnimation()
         {
-            var animator = !_isFinisher ? _markerAnimator : _finisherAnimator;
-            int rand = Random.Range(0, 2);
+            if (_isFinisher)
+            {
+                _finisherObject.SetActive(true);
+                _markerObject.SetActive(false);
 
-            animator.Play($"appear{rand}");
+                int rand = Random.Range(1, 2);
+                _finisherAnimator.Play($"finisher_appear_{rand}");
+            }
+            else
+            {
+                _finisherObject.SetActive(false);
+                _markerObject.SetActive(true);
+
+                int rand = Random.Range(1, 2);
+                _markerAnimator.Play($"marker_appear_{rand}");
+            }
+        }
+
+        private void Update()
+        {
+            if (gameObject.activeInHierarchy)
+            {
+                transform.LookAt(BoneLib.Player.GetPlayerHead()?.transform);
+
+                _timerHide += Time.deltaTime;
+
+                if (_timerHide > _timeUntilHide)
+                {
+                    gameObject.SetActive(false);
+                    _timerHide = 0f;
+                }
+            }
         }
 
         private void PlayAudio()
@@ -73,7 +105,7 @@ namespace NEP.Hitmarkers
             var selectedList = !_isFinisher ? _hitAudio : _finisherAudio;
             AudioClip clip = selectedList[Random.Range(0, selectedList.Length)];
 
-            AudioSource.PlayClipAtPoint(clip, transform.position);
+            Audio.HitmarkerAudio.PlayAtPoint(clip, transform.position);
         }
     }
 }
