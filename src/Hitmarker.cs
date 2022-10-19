@@ -54,6 +54,8 @@ namespace NEP.Hitmarkers
 
             _source = transform.Find("Source").GetComponent<AudioSource>();
 
+            SetTextures();
+
             _markerObject.SetActive(false);
             _finisherObject.SetActive(false);
         }
@@ -106,6 +108,17 @@ namespace NEP.Hitmarkers
             AudioClip clip = selectedList[Random.Range(0, selectedList.Length)];
 
             Audio.HitmarkerAudio.PlayAtPoint(clip, transform.position);
+        }
+
+        private void SetTextures()
+        {
+            Material markerMaterial = _markerObject.GetComponent<MeshRenderer>().material;
+            Material finisherMaterial = _finisherObject.GetComponent<MeshRenderer>().material;
+            Material finisherSkullMaterial = _finisherObject.transform.Find("DeathSkull").GetComponent<MeshRenderer>().material;
+
+            markerMaterial.mainTexture = DataManager.GetTexture("marker.png");
+            finisherMaterial.mainTexture = DataManager.GetTexture("finisher_marker.png");
+            finisherSkullMaterial.mainTexture = DataManager.GetTexture("finisher_feedback.png");
         }
     }
 }
