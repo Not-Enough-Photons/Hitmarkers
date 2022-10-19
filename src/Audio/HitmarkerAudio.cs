@@ -10,45 +10,51 @@ namespace NEP.Hitmarkers.Audio
     {
         public HitmarkerAudio(System.IntPtr ptr) : base(ptr) { }
 
-        public static List<AudioClip> hitAudio { get; private set; }
-        public static List<AudioClip> hitFinisherAudio { get; private set; }
+        public static HitmarkerAudio Instance;
+
+        public static AudioClip[] HitAudio;
+        public static AudioClip[] FinisherAudio;
 
         private static List<GameObject> pooledAudioObjects;
 
         private void Awake()
         {
-            pooledAudioObjects = new List<GameObject>();
+            if(Instance == null)
+            {
+                Instance = this;
+            }
 
-            hitAudio = new List<AudioClip>();
-            hitFinisherAudio = new List<AudioClip>();
+            DontDestroyOnLoad(Instance);
+
+            pooledAudioObjects = new List<GameObject>();
 
             GameObject listObj = new GameObject("Pooled Audio List");
             listObj.transform.parent = transform;
 
-            for(int i = 0; i < 64; i++)
+            for (int i = 0; i < 64; i++)
             {
                 GameObject pooledAudio = new GameObject("Poolee Audio");
                 pooledAudio.transform.parent = listObj.transform;
 
                 AudioSource source = pooledAudio.AddComponent<AudioSource>();
                 source.playOnAwake = true;
-                source.volume = HitmarkerManager._instance.hitmarkerAudio;
+                source.volume = 5f;
 
                 pooledAudio.AddComponent<PooledAudio>();
                 pooledAudio.SetActive(false);
                 pooledAudioObjects.Add(pooledAudio);
             }
 
-            hitAudio = AudioUtilities.GetClips(AudioUtilities.hitmarkerDir);
-            hitFinisherAudio = AudioUtilities.GetClips(AudioUtilities.hitmarkerFinisherDir);
+            HitAudio = Data.DataManager.HitClips;
+            FinisherAudio = Data.DataManager.FinisherClips;
         }
 
         public static void PlayAtPoint(AudioClip clip, Vector3 position)
         {
             GameObject first = pooledAudioObjects.FirstOrDefault((inactive) => !inactive.activeInHierarchy);
             AudioSource src = first.GetComponent<AudioSource>();
-             
-            if(first != null)
+
+            if (first != null)
             {
                 src.clip = clip;
                 first.transform.position = position;

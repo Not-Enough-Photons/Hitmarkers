@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using StressLevelZero.AI;
-using StressLevelZero.Combat;
+using SLZ.AI;
+using SLZ.Combat;
 using PuppetMasta;
 
 using System.Collections.Generic;
@@ -14,202 +14,83 @@ namespace NEP.Hitmarkers
     {
         public HitmarkerManager(System.IntPtr ptr) : base(ptr) { }
 
-        public static HitmarkerManager _instance;
+        public static HitmarkerManager Instance;
 
-        public static List<Hitmarker> regularHitmarkerPool;
-        public static List<Hitmarker> finisherHitmarkerPool;
+        private List<Hitmarker> _hitmarkers;
+        private List<Hitmarker> _finishers;
 
-        public static List<BehaviourBaseNav> deadNPCs;
-        public static Enemy_Turret lastDeadTurret;
+        private int _markerCount = 64;
 
-        public float hitmarkerScale = 1f;
-        public float distanceFromShot;
-        public float hitmarkerDistanceScale = 0.15f;
-        public float hitmarkerDistanceUntilScale = 10f;
-        public float hitmarkerAudio = 1f;
-        public float animationSpeed = 1f;
-        public bool useDeathSkull;
-        public Color hitmarkerColor;
-        public Color hitmarkerSkullColor;
-
-        private int hitmarkerPoolCount = 32;
-
-        public static Hitmarker lastHitmarker { get; set; }
+        private Transform _poolHitmarker;
+        private Transform _poolFinisher;
 
         private void Awake()
         {
-            if(_instance == null)
+            if(Instance == null)
             {
-                _instance = this;
+                Instance = this;
             }
 
-            DontDestroyOnLoad(_instance);
-        }
+            DontDestroyOnLoad(Instance);
 
-        private void Start()
-        {
-            HitmarkerManager.regularHitmarkerPool = new List<Hitmarker>();
-            HitmarkerManager.finisherHitmarkerPool = new List<Hitmarker>();
-            deadNPCs = new List<BehaviourBaseNav>();
+            BuildPools();
 
-            new GameObject("Hitmarker Audio").AddComponent<Audio.HitmarkerAudio>();
+            _hitmarkers = new List<Hitmarker>();
+            _finishers = new List<Hitmarker>();
 
-            Transform regularHitmarkerPool = new GameObject("Regular Hitmarker Pool").transform;
-            Transform finisherHitmarkerPool = new GameObject("Finisher Hitmarker Pool").transform;
-            regularHitmarkerPool.SetParent(transform);
-            finisherHitmarkerPool.SetParent(transform);
-
-            for(int i = 0; i < hitmarkerPoolCount; i++)
+            for(int i = 0; i < _markerCount; i++)
             {
-                Hitmarker hitmarker = new GameObject($"Regular Hitmarker {i}").AddComponent<Hitmarker>();
-                hitmarker.gameObject.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                hitmarker.transform.SetParent(regularHitmarkerPool);
-                HitmarkerManager.regularHitmarkerPool.Add(hitmarker);
-            }
-
-            for(int i = 0; i < hitmarkerPoolCount; i++)
-            {
-                Hitmarker hitmarker = new GameObject($"Finisher Hitmarker {i}").AddComponent<Hitmarker>();
-                hitmarker.gameObject.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                hitmarker.transform.SetParent(finisherHitmarkerPool);
-                hitmarker.UseFinisherHitmarker(true);
-                HitmarkerManager.finisherHitmarkerPool.Add(hitmarker);
+                _hitmarkers.Add(BuildHitmarker(isFinisher: false));
+                _finishers.Add(BuildHitmarker(isFinisher: true));
             }
         }
 
-        private void Update()
+        private void BuildPools()
         {
-            for (int i = 0; i < deadNPCs.Count; i++)
+            _poolHitmarker = new GameObject("Hitmarker Pool").transform;
+            _poolFinisher = new GameObject("Finisher Pool").transform;
+
+            _poolHitmarker.transform.SetParent(transform);
+            _poolFinisher.transform.SetParent(transform);
+        }
+
+        private Hitmarker BuildHitmarker(bool isFinisher)
+        {
+            string name = !isFinisher ? "Hitmarker" : "Finisher";
+            GameObject marker = GameObject.Instantiate(Data.DataManager.GetGameObject("Hitmarker"));
+
+            marker.name = name;
+            marker.hideFlags = HideFlags.DontUnloadUnusedAsset;
+
+            marker.transform.parent = !isFinisher ? _poolHitmarker : _poolFinisher;
+
+            // stops the loudest noise i've ever heard
+            marker.gameObject.SetActive(false);
+
+            return marker.AddComponent<Hitmarker>();
+        }
+
+        private Hitmarker GetInactiveMarker(bool finisher)
+        {
+            var list = !finisher ? _hitmarkers : _finishers;
+
+            for(int i = 0; i < list.Count; i++)
             {
-                if (deadNPCs[i].health.cur_hp > 0f || deadNPCs[i] == null)
+                if (!list[i].gameObject.activeInHierarchy)
                 {
-                    deadNPCs.RemoveAt(i);
+                    return list[i];
                 }
-            }
-        }
-
-        // From ModThatIsNotMod
-        public static Transform GetPlayerHead()
-        {
-            GameObject rigManager = GameObject.Find("[RigManager (Default Brett)]");
-
-            if (rigManager != null)
-            {
-                return rigManager.transform.Find("[PhysicsRig]/Head/PlayerTrigger");
             }
 
             return null;
         }
 
-        public void OnProjectileCollision(TriggerRefProxy playerProxy, Collider collider, Vector3 impactWorld, Vector3 impactNormal)
+        public void SpawnMarker(Vector3 position, bool finisher = false)
         {
-            if (!HitmarkersMain.enableMod) { return; }
-
-            try
-            {
-                distanceFromShot = (impactWorld - GetPlayerHead().position).magnitude;
-
-                if (collider.gameObject.layer != 12 || playerProxy.triggerType != TriggerRefProxy.TriggerType.Player) { return; }
-                //if (playerProxy.root.name != "[RigManager (Default Brett)]") { return; }
-
-                EvaluateEntanglementPlayer(playerProxy, collider, impactWorld);
-                EvaluateNPC(collider.transform, impactWorld);
-            }
-            catch { }
-        }
-
-        public void OnStabJointCreated(StabSlash.StabPoint stabPoint, ConfigurableJoint joint)
-        {
-            if(stabPoint.stabJoints[0] != null)
-            {
-                EvaluateNPC(stabPoint.stabJoints[0].collider.transform, stabPoint.pointTran.position);
-            }
-        }
-
-        private void EvaluateEntanglementPlayer(TriggerRefProxy proxy, Collider collider, Vector3 impactWorld)
-        {
-            Transform playerRepRoot = collider.transform.root;
-
-            // Simple Entanglement support
-            if (playerRepRoot.name.StartsWith("PlayerRep"))
-            {
-                SpawnHitmarker(false, impactWorld);
-            }
-        }
-
-        private void EvaluateNPC(Transform transform, Vector3 impactWorld)
-        {
-            MelonLoader.MelonLogger.Msg(transform.name);
-            AIBrain brain = transform.GetComponentInParent<AIBrain>();
-
-            if (brain == null) { return; }
-
-            BehaviourBaseNav navBehaviour = brain.behaviour;
-
-            if (navBehaviour.puppetMaster.isDead || navBehaviour == deadNPCs.FirstOrDefault((npc) => npc == navBehaviour)) { return; }
-
-            SpawnHitmarker(navBehaviour.puppetMaster.isKilling, impactWorld);
-        }
-
-        public static void SpawnHitmarker(bool isFinisher, Vector3 position)
-        {
-            if (!HitmarkersMain.enableMod) { return; }
-
-            Hitmarker hitmarker = isFinisher ? finisherHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active) : regularHitmarkerPool.FirstOrDefault((marker) => !marker.gameObject.active);
-
-            lastHitmarker = hitmarker;
-
-            SetupHitmarker(hitmarker, position);
-
-            hitmarker.gameObject.SetActive(true);
-        }
-
-        private static void SetupHitmarker(Hitmarker hitmarker, Vector3 position)
-        {
-            hitmarker.transform.position = position;
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(StabSlash.StabPoint))]
-    [HarmonyLib.HarmonyPatch(nameof(StabSlash.StabPoint.JointSetup))]
-    public static class StabPatch
-    {
-        public static void Postfix(StabSlash.StabPoint __instance, ConfigurableJoint j)
-        {
-            HitmarkerManager._instance.OnStabJointCreated(__instance, j);
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(Projectile))]
-    [HarmonyLib.HarmonyPatch(nameof(Projectile.Awake))]
-    public static class ProjectilePatch
-    {
-        public static void Prefix(Projectile __instance)
-        {
-            __instance.onCollision.AddListener(
-                new System.Action<Collider, Vector3, Vector3>
-                (((Collider collider, Vector3 world, Vector3 normal)
-                =>
-                {
-                    HitmarkerManager._instance.OnProjectileCollision(__instance._proxy, collider, world, normal);
-                })));
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(BehaviourBaseNav))]
-    [HarmonyLib.HarmonyPatch(nameof(BehaviourBaseNav.KillStart))]
-    public static class BehaviourPatch
-    {
-        public static void Postfix(BehaviourBaseNav __instance)
-        {
-            HitmarkerManager.deadNPCs.Add(__instance);
-
-            if(HitmarkerManager.lastHitmarker != null)
-            {
-                HitmarkerManager.lastHitmarker.gameObject.SetActive(false);
-                HitmarkerManager.SpawnHitmarker(true, HitmarkerManager.lastHitmarker.transform.position);
-                HitmarkerManager.lastHitmarker = null;
-            }
+            Hitmarker marker = GetInactiveMarker(finisher);
+            marker.IsFinisher = finisher;
+            marker.transform.position = position;
+            marker.gameObject.SetActive(true);
         }
     }
 }
