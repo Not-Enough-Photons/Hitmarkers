@@ -77,4 +77,24 @@ namespace NEP.Hitmarkers
             __instance.behaviour.OnDeath.AddListener(new System.Action(() => HitDirector.OnAIDeath(__instance)));
         }
     }
+
+    [HarmonyLib.HarmonyPatch(typeof(PuppetMaster))]
+    [HarmonyLib.HarmonyPatch(nameof(PuppetMaster.Awake))]
+    public static class PuppetMasterPatch
+    {
+        public static void Postfix(PuppetMaster __instance)
+        {
+            PuppetMaster.StateSettings settings = new PuppetMaster.StateSettings()
+            {
+                deadMuscleDamper = __instance.stateSettings.deadMuscleDamper,
+                deadMuscleWeight = __instance.stateSettings.deadMuscleWeight,
+                enableAngularLimitsOnKill = __instance.stateSettings.enableAngularLimitsOnKill,
+                enableInternalCollisionsOnKill = __instance.stateSettings.enableInternalCollisionsOnKill,
+                killDuration = 0f,
+                maxFreezeSqrVelocity = __instance.stateSettings.maxFreezeSqrVelocity
+            };
+
+            __instance.stateSettings = settings;
+        }
+    }
 }
