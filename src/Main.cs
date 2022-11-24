@@ -1,7 +1,12 @@
 ﻿using MelonLoader;
+
 using BoneLib;
+using BoneLib.BoneMenu;
+using BoneLib.BoneMenu.Elements;
 
 using SLZ.Marrow.Utilities;
+
+using UnityEngine;
 
 namespace NEP.Hitmarkers
 {
@@ -19,6 +24,10 @@ namespace NEP.Hitmarkers
     {
         public override void OnInitializeMelon()
         {
+            Data.Options.Init();
+
+            SetupBoneMenu();
+
             Data.DataManager.Initialize();
             MarrowGame.RegisterOnReadyAction(new System.Action(() => OnMarrowGameStart()));
         }
@@ -28,6 +37,42 @@ namespace NEP.Hitmarkers
             new UnityEngine.GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
             new UnityEngine.GameObject("Hitmarker Audio").AddComponent<Audio.HitmarkerAudio>();
             HitDirector.Initialize();
+        }
+
+        private void SetupBoneMenu()
+        {
+            MenuCategory hitmarkersCategory = null;
+
+            if (MenuManager.GetCategory("Not Enough Photons") != null)
+            {
+                hitmarkersCategory = MenuManager.GetCategory("Not Enough Photons");
+            }
+            else
+            {
+                hitmarkersCategory = MenuManager.CreateCategory("Not Enough Photons", "#08104d");
+            }
+
+            var options = hitmarkersCategory.CreateCategory("Hitmarkers", Color.white);
+
+            options.CreateBoolElement(
+                "Enable Hitmarkers", 
+                Color.white, 
+                Data.Options.EnableHitmarkers, 
+                (value) => Data.Options.SetEnableHitmarkers(value));
+
+            options.CreateFloatElement(
+                "Hitmarker SFX", 
+                Color.white, 
+                Data.Options.HitmarkerSFX, 
+                10f, 0f, 100f, 
+                (value) => Data.Options.SetHitmarkerSFX(value));
+
+            options.CreateFloatElement(
+                "Hitmarker Pitch", 
+                Color.white, 
+                Data.Options.HitmarkerPitch, 
+                0.25f, 0f, 2f, 
+                (value) => Data.Options.SetHitmarkerPitch(value));
         }
     }
 }

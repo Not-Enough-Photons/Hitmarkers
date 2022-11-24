@@ -87,6 +87,11 @@ namespace NEP.Hitmarkers
 
         public void SpawnMarker(Vector3 position, bool finisher = false)
         {
+            if (!Data.Options.EnableHitmarkers)
+            {
+                return;
+            }
+
             Hitmarker marker = GetInactiveMarker(finisher);
             marker.IsFinisher = finisher;
             marker.transform.position = position;

@@ -56,6 +56,8 @@ namespace NEP.Hitmarkers.Audio
 
             if (first != null)
             {
+                src.volume = Data.Options.HitmarkerSFX / 100f;
+                src.pitch = Data.Options.HitmarkerPitch;
                 src.clip = clip;
                 first.transform.position = position;
                 first.SetActive(true);

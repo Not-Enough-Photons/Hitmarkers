@@ -32,6 +32,7 @@
     <Compile Include="src\Audio\HitmarkerAudio.cs" />
     <Compile Include="src\Audio\PooledAudio.cs" />
     <Compile Include="src\Data\DataManager.cs" />
+    <Compile Include="src\Data\Options.cs" />
     <Compile Include="src\HitData.cs" />
     <Compile Include="src\HitDirector.cs" />
     <Compile Include="src\Hitmarker.cs" />
