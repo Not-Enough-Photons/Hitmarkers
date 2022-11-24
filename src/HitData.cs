@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using StressLevelZero.AI;
+using StressLevelZero.Combat;
 
 using PuppetMasta;
 

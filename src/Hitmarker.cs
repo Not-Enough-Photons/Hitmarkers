@@ -62,6 +62,7 @@ namespace NEP.Hitmarkers
 
         private void OnEnable()
         {
+            UseSettings();
             PlayAnimation();
             PlayAudio();
         }
@@ -90,7 +91,7 @@ namespace NEP.Hitmarkers
         {
             if (gameObject.activeInHierarchy)
             {
-                transform.LookAt(BoneLib.Player.GetPlayerHead()?.transform);
+                transform.LookAt(ModThatIsNotMod.Player.GetPlayerHead()?.transform);
 
                 _timerHide += Time.deltaTime;
 
@@ -102,12 +103,29 @@ namespace NEP.Hitmarkers
             }
         }
 
+        private void UseSettings()
+        {
+            float distanceFromShot = HitmarkerManager.Instance.DistanceFromShot;
+            float distanceScale = HitmarkerManager.Instance.HitmarkerDistanceScale;
+            float distanceUntilScale = HitmarkerManager.Instance.HitmarkerDistanceUntilScale;
+            float hitmarkerAudio = HitmarkerManager.Instance.HitmarkerVolume;
+            float animationSpeed = HitmarkerManager.Instance.HitmarkerAnimationSpeed;
+
+            Vector3 baseScale = Vector3.one * HitmarkerManager.Instance.HitmarkerScale;
+            float newDistanceScale = distanceScale * distanceFromShot;
+
+            transform.localScale = distanceFromShot >= distanceUntilScale ? baseScale * newDistanceScale : baseScale;
+
+            _source.volume = hitmarkerAudio;
+            _markerAnimator.speed = animationSpeed;
+            _finisherAnimator.speed = animationSpeed;
+        }
+
         private void PlayAudio()
         {
             var selectedList = !_isFinisher ? _hitAudio : _finisherAudio;
             AudioClip clip = selectedList[Random.Range(0, selectedList.Length)];
-
-            Audio.HitmarkerAudio.PlayAtPoint(clip, transform.position);
+            _source.clip = clip;
         }
 
         private void SetTextures()

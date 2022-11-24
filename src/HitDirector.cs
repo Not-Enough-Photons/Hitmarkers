@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using StressLevelZero.AI;
+using StressLevelZero.Combat;
 
 using PuppetMasta;
 
@@ -47,11 +47,11 @@ namespace NEP.Hitmarkers
         }
     }
 
-    [HarmonyLib.HarmonyPatch(typeof(SLZ.Combat.Projectile))]
-    [HarmonyLib.HarmonyPatch(nameof(SLZ.Combat.Projectile.Awake))]
+    [HarmonyLib.HarmonyPatch(typeof(Projectile))]
+    [HarmonyLib.HarmonyPatch(nameof(Projectile.Awake))]
     public static class ProjectilePatch
     {
-        public static void Postfix(SLZ.Combat.Projectile __instance)
+        public static void Postfix(Projectile __instance)
         {
             __instance.onCollision.AddListener(new System.Action<Collider, Vector3, Vector3>((hitCol, world, normal) =>
             {
@@ -69,12 +69,12 @@ namespace NEP.Hitmarkers
     }
 
     [HarmonyLib.HarmonyPatch(typeof(AIBrain))]
-    [HarmonyLib.HarmonyPatch(nameof(AIBrain.Awake))]
+    [HarmonyLib.HarmonyPatch(nameof(AIBrain.OnDeath))]
     public static class AIBrainPatch
     {
         public static void Postfix(AIBrain __instance)
         {
-            __instance.behaviour.OnDeath.AddListener(new System.Action(() => HitDirector.OnAIDeath(__instance)));
+            HitDirector.OnAIDeath(__instance);
         }
     }
 

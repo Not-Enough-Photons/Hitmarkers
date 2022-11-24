@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using StressLevelZero.AI;
+using StressLevelZero.Combat;
 using PuppetMasta;
 
 using System.Collections.Generic;
@@ -16,6 +16,15 @@ namespace NEP.Hitmarkers
 
         public static HitmarkerManager Instance;
 
+        public bool EnableHitmarkers = true;
+        public float HitmarkerScale = 1f;
+        public float DistanceFromShot;
+        public float HitmarkerDistanceScale = 0.15f;
+        public float HitmarkerDistanceUntilScale = 10f;
+        public float HitmarkerVolume = 1f;
+        public float HitmarkerAnimationSpeed = 1f;
+        public bool UseDeathSkull = true;
+
         private List<Hitmarker> _hitmarkers;
         private List<Hitmarker> _finishers;
 
@@ -26,12 +35,7 @@ namespace NEP.Hitmarkers
 
         private void Awake()
         {
-            if(Instance == null)
-            {
-                Instance = this;
-            }
-
-            DontDestroyOnLoad(Instance);
+            Instance = this;
 
             BuildPools();
 
@@ -87,6 +91,11 @@ namespace NEP.Hitmarkers
 
         public void SpawnMarker(Vector3 position, bool finisher = false)
         {
+            if (!EnableHitmarkers)
+            {
+                return;
+            }
+
             Hitmarker marker = GetInactiveMarker(finisher);
             marker.IsFinisher = finisher;
             marker.transform.position = position;

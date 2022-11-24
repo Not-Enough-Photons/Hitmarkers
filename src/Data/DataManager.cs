@@ -130,7 +130,7 @@ namespace NEP.Hitmarkers.Data
             foreach(var file in Directory.GetFiles(path_Audio))
             {
                 string newName = file.Substring(path_Audio.Length + 1);
-                MelonLoader.Melon<Main>.Logger.Msg($"Loading Clip {newName}...");
+                MelonLoader.MelonLogger.Msg($"Loading Clip {newName}...");
 
                 if (newName.StartsWith("marker_"))
                 {
@@ -141,7 +141,7 @@ namespace NEP.Hitmarkers.Data
                     _clipFinishers.Add(API.LoadAudioClip(file));
                 }
 
-                MelonLoader.Melon<Main>.Logger.Msg($"Successfully Loaded {newName}!");
+                MelonLoader.MelonLogger.Msg($"Successfully Loaded {newName}!");
             }
         }
 
@@ -150,13 +150,13 @@ namespace NEP.Hitmarkers.Data
             foreach (var file in Directory.GetFiles(path_Textures))
             {
                 string newName = file.Substring(path_Textures.Length + 1);
-                MelonLoader.Melon<Main>.Logger.Msg($"Loading Texture {newName}...");
+                MelonLoader.MelonLogger.Msg($"Loading Texture {newName}...");
 
                 Texture2D texture = new Texture2D(2, 2);
 
                 if (!File.Exists(file))
                 {
-                    MelonLoader.Melon<Main>.Logger.Warning($"Couldn't load {newName}! Going to use a white square instead.");
+                    MelonLoader.MelonLogger.Warning($"Couldn't load {newName}! Going to use a white square instead.");
                 }
                 else
                 {
@@ -167,7 +167,7 @@ namespace NEP.Hitmarkers.Data
                 texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
                 texture.name = newName;
 
-                MelonLoader.Melon<Main>.Logger.Msg($"Successfully loaded {texture.name}!");
+                MelonLoader.MelonLogger.Msg($"Successfully loaded {texture.name}!");
                 _textures.Add(texture);
             }
         }

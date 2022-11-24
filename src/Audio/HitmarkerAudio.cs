@@ -19,12 +19,7 @@ namespace NEP.Hitmarkers.Audio
 
         private void Awake()
         {
-            if(Instance == null)
-            {
-                Instance = this;
-            }
-
-            DontDestroyOnLoad(Instance);
+            Instance = this;
 
             pooledAudioObjects = new List<GameObject>();
 
