@@ -90,7 +90,7 @@ namespace NEP.Hitmarkers
         {
             if (gameObject.activeInHierarchy)
             {
-                transform.LookAt(BoneLib.Player.GetPlayerHead()?.transform);
+                transform.LookAt(BoneLib.Player.playerHead);
 
                 _timerHide += Time.deltaTime;
 
