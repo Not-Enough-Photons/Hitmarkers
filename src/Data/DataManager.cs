@@ -4,6 +4,7 @@ using AudioImportLib;
 
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -71,7 +72,7 @@ namespace NEP.Hitmarkers.Data
             _clipHitmarkers = new List<AudioClip>();
             _clipFinishers = new List<AudioClip>();
 
-            _bundle = AssetBundle.LoadFromFile(path_Resources);
+            _bundle = GetEmbeddedBundle();
             _bundleObjects = _bundle.LoadAllAssets();
 
             GetGameObjects();
@@ -169,6 +170,22 @@ namespace NEP.Hitmarkers.Data
 
                 MelonLoader.Melon<Main>.Logger.Msg($"Successfully loaded {texture.name}!");
                 _textures.Add(texture);
+            }
+        }
+
+        static AssetBundle GetEmbeddedBundle()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            string fileName = BoneLib.HelperMethods.IsAndroid() ? "resources_quest.pack" : "resources_pcvr.pack";
+
+            using (Stream resourceStream = assembly.GetManifestResourceStream("NEP.Hitmarkers.Resources." + fileName))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    resourceStream.CopyTo(memoryStream);
+                    return AssetBundle.LoadFromMemory(memoryStream.ToArray());
+                }
             }
         }
     }

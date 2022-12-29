@@ -51,7 +51,8 @@
     <Reference Include="AudioImportLib">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\AudioImportLib.dll</HintPath>
     </Reference>
-    <Reference Include="BoneLib">
+    <Reference Include="BoneLib, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods\BoneLib.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -112,6 +113,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\BONELAB\MelonLoader\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\resources_pcvr.pack" />
+    <EmbeddedResource Include="Resources\resources_quest.pack" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
