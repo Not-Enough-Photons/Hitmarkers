@@ -4,17 +4,19 @@ using SLZ.AI;
 using SLZ.Combat;
 
 using PuppetMasta;
+using System.Linq;
 
 namespace NEP.Hitmarkers
 {
     public static class HitDirector
     {
         public static System.Action<HitData> OnHit;
-        public static System.Action<AIBrain> OnKill;
+        public static System.Action<PuppetMaster> OnKill;
 
         public static void Initialize()
         {
             OnHit += OnProjectileHit;
+            PuppetMaster.add_OnDeathStatsEvent(new System.Action<PuppetMaster>(OnPuppetDeath));
         }
 
         public static void OnProjectileHit(HitData data)
@@ -41,17 +43,21 @@ namespace NEP.Hitmarkers
             HitmarkerManager.Instance.SpawnMarker(data.worldHit);
         }
 
-        public static void OnAIDeath(AIBrain brain)
+        public static void OnPuppetDeath(PuppetMaster puppet)
         {
-            HitmarkerManager.Instance.SpawnMarker(brain.behaviour.eyeTran.position, true);
+            BehaviourBaseNav bbn = puppet.behaviours?.FirstOrDefault()?.TryCast<BehaviourBaseNav>();
+            if (bbn == null) return;
+
+            OnKill?.Invoke(puppet);
+            HitmarkerManager.Instance.SpawnMarker(bbn.eyeTran.position, true);
         }
     }
 
-    [HarmonyLib.HarmonyPatch(typeof(SLZ.Combat.Projectile))]
-    [HarmonyLib.HarmonyPatch(nameof(SLZ.Combat.Projectile.Awake))]
+    [HarmonyLib.HarmonyPatch(typeof(Projectile))]
+    [HarmonyLib.HarmonyPatch(nameof(Projectile.Awake))]
     public static class ProjectilePatch
     {
-        public static void Postfix(SLZ.Combat.Projectile __instance)
+        public static void Postfix(Projectile __instance)
         {
             __instance.onCollision.AddListener(new System.Action<Collider, Vector3, Vector3>((hitCol, world, normal) =>
             {
@@ -68,31 +74,15 @@ namespace NEP.Hitmarkers
         }
     }
 
-    [HarmonyLib.HarmonyPatch(typeof(AIBrain))]
-    [HarmonyLib.HarmonyPatch(nameof(AIBrain.Awake))]
-    public static class AIBrainPatch
-    {
-        public static void Postfix(AIBrain __instance)
-        {
-            __instance.behaviour.OnDeath.AddListener(new System.Action(() => HitDirector.OnAIDeath(__instance)));
-        }
-    }
-
     [HarmonyLib.HarmonyPatch(typeof(PuppetMaster))]
     [HarmonyLib.HarmonyPatch(nameof(PuppetMaster.Awake))]
     public static class PuppetMasterPatch
     {
         public static void Postfix(PuppetMaster __instance)
         {
-            PuppetMaster.StateSettings settings = new PuppetMaster.StateSettings()
-            {
-                deadMuscleDamper = __instance.stateSettings.deadMuscleDamper,
-                deadMuscleWeight = __instance.stateSettings.deadMuscleWeight,
-                enableAngularLimitsOnKill = __instance.stateSettings.enableAngularLimitsOnKill,
-                enableInternalCollisionsOnKill = __instance.stateSettings.enableInternalCollisionsOnKill,
-                killDuration = 0f,
-                maxFreezeSqrVelocity = __instance.stateSettings.maxFreezeSqrVelocity
-            };
+            PuppetMaster.StateSettings settings = __instance.stateSettings; // structs are value types
+            settings.killDuration = 0;
+
 
             __instance.stateSettings = settings;
         }
