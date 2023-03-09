@@ -5,6 +5,9 @@ using SLZ.Combat;
 
 using PuppetMasta;
 using System.Linq;
+using System.Collections.Generic;
+using static Il2CppSystem.Globalization.CultureInfo;
+using MelonLoader;
 
 namespace NEP.Hitmarkers
 {
@@ -19,28 +22,46 @@ namespace NEP.Hitmarkers
             PuppetMaster.add_OnDeathStatsEvent(new System.Action<PuppetMaster>(OnPuppetDeath));
         }
 
-        public static void OnProjectileHit(HitData data)
+        public static bool EvaluateHit(HitData data)
         {
             // Makes it so any NPC with a gun can't spawn hitmarkers
-            if(data.projectile._proxy.triggerType != TriggerRefProxy.TriggerType.Player)
+            if (data.projectile._proxy.triggerType != TriggerRefProxy.TriggerType.Player)
             {
-                return;
+                return true;
             }
 
-            if(data.collider.gameObject.layer != LayerMask.NameToLayer("EnemyColliders"))
-            {
-                return;
-            }
-
-            if(data.brain != null)
+            if (data.brain != null)
             {
                 if (data.brain.isDead)
                 {
-                    return;
+                    return false;
                 }
             }
 
-            HitmarkerManager.Instance.SpawnMarker(data.worldHit);
+            var hitObject = data.collider.gameObject;
+
+            bool hitEnemy = hitObject.layer == LayerMask.NameToLayer("EnemyColliders");
+            bool hitNetworkedPlayer = hitObject.transform.root.name == "[RigManager (FUSION PlayerRep)]";
+
+            if (hitEnemy)
+            {
+                return true;
+            }
+
+            if (hitNetworkedPlayer)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void OnProjectileHit(HitData data)
+        {
+            if (EvaluateHit(data))
+            {
+                HitmarkerManager.Instance.SpawnMarker(data.worldHit);
+            }
         }
 
         public static void OnPuppetDeath(PuppetMaster puppet)
