@@ -6,6 +6,7 @@ using PuppetMasta;
 
 using System.Collections.Generic;
 using System.Linq;
+using BoneLib;
 
 namespace NEP.Hitmarkers
 {
@@ -96,6 +97,17 @@ namespace NEP.Hitmarkers
             marker.IsFinisher = finisher;
             marker.transform.position = position;
             marker.gameObject.SetActive(true);
+
+            float distance = Vector3.Distance(marker.transform.position, Player.playerHead.position);
+
+            if(distance < 5)
+            {
+                marker.transform.localScale = Vector3.one;
+            }
+            else
+            {
+                marker.transform.localScale = Vector3.one * Mathf.Pow(2f, 1 + (distance / 50));
+            }
         }
     }
 }

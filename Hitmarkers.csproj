@@ -118,6 +118,9 @@
     <EmbeddedResource Include="Resources\resources_pcvr.pack" />
     <EmbeddedResource Include="Resources\resources_quest.pack" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\HitmarkersFusionModule.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>COPY "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\BONELAB\Mods"

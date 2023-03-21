@@ -8,6 +8,9 @@ using System.Linq;
 using System.Collections.Generic;
 using static Il2CppSystem.Globalization.CultureInfo;
 using MelonLoader;
+using BoneLib;
+using SLZ.Rig;
+using SLZ.SFX;
 
 namespace NEP.Hitmarkers
 {
@@ -15,6 +18,8 @@ namespace NEP.Hitmarkers
     {
         public static System.Action<HitData> OnHit;
         public static System.Action<PuppetMaster> OnKill;
+
+        public static RigManager lastHitManager;
 
         public static void Initialize()
         {
@@ -24,6 +29,11 @@ namespace NEP.Hitmarkers
 
         public static bool EvaluateHit(HitData data)
         {
+            if(data.projectile._proxy.root.name != "[RigManager (Blank)]")
+            {
+                return false;
+            }
+
             // Makes it so any NPC with a gun can't spawn hitmarkers
             if (data.projectile._proxy.triggerType != TriggerRefProxy.TriggerType.Player)
             {
@@ -41,14 +51,8 @@ namespace NEP.Hitmarkers
             var hitObject = data.collider.gameObject;
 
             bool hitEnemy = hitObject.layer == LayerMask.NameToLayer("EnemyColliders");
-            bool hitNetworkedPlayer = hitObject.transform.root.name == "[RigManager (FUSION PlayerRep)]";
 
             if (hitEnemy)
-            {
-                return true;
-            }
-
-            if (hitNetworkedPlayer)
             {
                 return true;
             }
@@ -103,7 +107,6 @@ namespace NEP.Hitmarkers
         {
             PuppetMaster.StateSettings settings = __instance.stateSettings; // structs are value types
             settings.killDuration = 0;
-
 
             __instance.stateSettings = settings;
         }

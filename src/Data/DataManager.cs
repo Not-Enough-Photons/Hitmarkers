@@ -5,6 +5,7 @@ using AudioImportLib;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -128,7 +129,7 @@ namespace NEP.Hitmarkers.Data
 
         static void GetAudio()
         {
-            foreach(var file in Directory.GetFiles(path_Audio))
+            foreach (var file in Directory.GetFiles(path_Audio))
             {
                 string newName = file.Substring(path_Audio.Length + 1);
                 MelonLoader.Melon<Main>.Logger.Msg($"Loading Clip {newName}...");
@@ -173,7 +174,7 @@ namespace NEP.Hitmarkers.Data
             }
         }
 
-        static AssetBundle GetEmbeddedBundle()
+        internal static AssetBundle GetEmbeddedBundle()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
 
@@ -187,6 +188,23 @@ namespace NEP.Hitmarkers.Data
                     return AssetBundle.LoadFromMemory(memoryStream.ToArray());
                 }
             }
+        }
+
+        internal static byte[] Internal_LoadFromAssembly(Assembly assembly, string name)
+        {
+            string[] manifestResources = assembly.GetManifestResourceNames();
+
+            if (manifestResources.Contains(name))
+            {
+                using (Stream str = assembly.GetManifestResourceStream(name))
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    str.CopyTo(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+
+            return null;
         }
     }
 }

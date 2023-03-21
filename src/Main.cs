@@ -7,6 +7,7 @@ using BoneLib.BoneMenu.Elements;
 using SLZ.Marrow.Utilities;
 
 using UnityEngine;
+using System.Reflection;
 
 namespace NEP.Hitmarkers
 {
@@ -22,8 +23,13 @@ namespace NEP.Hitmarkers
 
     public class Main : MelonMod
     {
+        internal const string EmbeddedModule = "NEP.Hitmarkers.Resources.HitmarkersFusionModule.dll";
+
         public override void OnInitializeMelon()
         {
+            var moduleData = Data.DataManager.Internal_LoadFromAssembly(Assembly.GetExecutingAssembly(), EmbeddedModule);
+            Assembly.Load(moduleData);
+
             Data.Options.Init();
 
             SetupBoneMenu();
