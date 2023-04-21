@@ -29,19 +29,24 @@ namespace NEP.Hitmarkers
 
         public static bool EvaluateHit(HitData data)
         {
-            if(data.projectile._proxy.root.name != "[RigManager (Blank)]")
+            TriggerRefProxy proxy = data.projectile._proxy;
+            
+            // If we didn't fire the shot in a Fusion server, don't spawn a marker
+            if(proxy.root.name != "[RigManager (Blank)]")
             {
                 return false;
             }
 
             // Makes it so any NPC with a gun can't spawn hitmarkers
-            if (data.projectile._proxy.triggerType != TriggerRefProxy.TriggerType.Player)
+            if (proxy.triggerType != TriggerRefProxy.TriggerType.Player)
             {
                 return true;
             }
 
+            // Has a brain?
             if (data.brain != null)
             {
+                // Is the brain already dead?
                 if (data.brain.isDead)
                 {
                     return false;
@@ -51,8 +56,14 @@ namespace NEP.Hitmarkers
             var hitObject = data.collider.gameObject;
 
             bool hitEnemy = hitObject.layer == LayerMask.NameToLayer("EnemyColliders");
+            bool hitProxy = hitObject.GetComponent<HitmarkerProxy>();
 
             if (hitEnemy)
+            {
+                return true;
+            }
+
+            if (hitProxy)
             {
                 return true;
             }

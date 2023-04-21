@@ -79,6 +79,16 @@ namespace NEP.Hitmarkers
                 Data.Options.HitmarkerPitch, 
                 0.25f, 0f, 2f, 
                 (value) => Data.Options.SetHitmarkerPitch(value));
+
+            options.CreateFunctionElement(
+                "Test Proxy",
+                Color.white,
+                () =>
+                {
+                    var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    obj.AddComponent<HitmarkerProxy>();
+                }
+                );
         }
     }
 }

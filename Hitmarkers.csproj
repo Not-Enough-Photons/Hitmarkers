@@ -37,6 +37,7 @@
     <Compile Include="src\HitDirector.cs" />
     <Compile Include="src\Hitmarker.cs" />
     <Compile Include="src\HitmarkerManager.cs" />
+    <Compile Include="src\HitmarkerProxy.cs" />
     <Compile Include="src\Main.cs" />
   </ItemGroup>
   <ItemGroup>
