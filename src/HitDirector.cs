@@ -56,12 +56,13 @@ namespace NEP.Hitmarkers
             var hitObject = data.collider.gameObject;
 
             bool hitEnemy = hitObject.layer == LayerMask.NameToLayer("EnemyColliders");
-            bool hitProxy = hitObject.GetComponent<HitmarkerProxy>();
 
             if (hitEnemy)
             {
                 return true;
             }
+
+            bool hitProxy = hitObject.GetComponent<HitmarkerProxy>();
 
             if (hitProxy)
             {

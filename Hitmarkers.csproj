@@ -39,6 +39,7 @@
     <Compile Include="src\HitmarkerManager.cs" />
     <Compile Include="src\HitmarkerProxy.cs" />
     <Compile Include="src\Main.cs" />
+    <Compile Include="src\MarkerType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
