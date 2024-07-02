@@ -1,12 +1,6 @@
-﻿using UnityEngine;
-
-using SLZ.AI;
-using SLZ.Combat;
-using PuppetMasta;
-
+﻿using BoneLib;
+using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
-using BoneLib;
 
 namespace NEP.Hitmarkers
 {
@@ -98,7 +92,7 @@ namespace NEP.Hitmarkers
             marker.transform.position = position;
             marker.gameObject.SetActive(true);
 
-            float distance = Vector3.Distance(marker.transform.position, Player.playerHead.position);
+            float distance = Vector3.Distance(marker.transform.position, Player.Head.position);
 
             if(distance < 5)
             {

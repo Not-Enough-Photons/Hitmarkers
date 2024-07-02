@@ -1,16 +1,11 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using Il2CppSLZ.Marrow.AI;
+using Il2CppSLZ.Combat;
+using Il2CppSLZ.Marrow.PuppetMasta;
+using Il2CppSLZ.Rig;
 
-using PuppetMasta;
 using System.Linq;
-using System.Collections.Generic;
-using static Il2CppSystem.Globalization.CultureInfo;
-using MelonLoader;
-using BoneLib;
-using SLZ.Rig;
-using SLZ.SFX;
 
 namespace NEP.Hitmarkers
 {

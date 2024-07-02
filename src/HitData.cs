@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using Il2CppSLZ.Marrow.AI;
+using Il2CppSLZ.Combat;
 
-using PuppetMasta;
+using Il2CppPuppetMasta;
 
 namespace NEP.Hitmarkers
 {
@@ -13,7 +13,7 @@ namespace NEP.Hitmarkers
         public Vector3 worldHit;
         public Collider collider;
 
-        public BehaviourBaseNav behaviour;
+        public BehaviourPowerLegs behaviour;
         public AIBrain brain;
     }
 }

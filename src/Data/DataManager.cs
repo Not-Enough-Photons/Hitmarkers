@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using MelonLoader;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -149,9 +150,10 @@ namespace NEP.Hitmarkers.Data
 
         static void GetTextures()
         {
-            foreach (var file in Directory.GetFiles(path_Textures))
+            var texturePath = Path.Combine(path_Mod, "Textures");
+            foreach (var file in Directory.GetFiles(texturePath))
             {
-                string newName = file.Substring(path_Textures.Length + 1);
+                string newName = file.Substring(texturePath.Length + 1);
                 MelonLoader.Melon<Main>.Logger.Msg($"Loading Texture {newName}...");
 
                 Texture2D texture = new Texture2D(2, 2);
