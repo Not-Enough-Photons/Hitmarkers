@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using MelonLoader.Utils;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -46,7 +47,7 @@ namespace NEP.Hitmarkers.Data
             get => _clipFinishers.ToArray();
         }
 
-        static readonly string path_UserData = MelonLoader.MelonUtils.UserDataDirectory;
+        static readonly string path_UserData = MelonEnvironment.UserDataDirectory;
         static readonly string path_Developer = path_UserData + "/Not Enough Photons";
         static readonly string path_Mod = path_Developer + "/Hitmarkers";
 

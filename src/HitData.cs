@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-using SLZ.AI;
-using SLZ.Combat;
+using Il2CppSLZ.Marrow.AI;
+using Il2CppSLZ.Combat;
 
-using PuppetMasta;
+using Il2CppSLZ.Marrow.PuppetMasta;
 
 namespace NEP.Hitmarkers
 {

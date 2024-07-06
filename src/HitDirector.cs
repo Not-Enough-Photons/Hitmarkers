@@ -1,16 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Linq;
 
-using SLZ.AI;
-using SLZ.Combat;
+using UnityEngine;
 
-using PuppetMasta;
-using System.Linq;
-using System.Collections.Generic;
-using static Il2CppSystem.Globalization.CultureInfo;
-using MelonLoader;
+using Il2CppSLZ.Marrow.AI;
+using Il2CppSLZ.Combat;
+using Il2CppSLZ.Marrow.PuppetMasta;
+using Il2CppSLZ.Rig;
+using Il2CppSLZ.Marrow.Interaction;
+
 using BoneLib;
-using SLZ.Rig;
-using SLZ.SFX;
 
 namespace NEP.Hitmarkers
 {
@@ -31,11 +29,9 @@ namespace NEP.Hitmarkers
         {
             TriggerRefProxy proxy = data.projectile._proxy;
             
-            // If we didn't fire the shot in a Fusion server, don't spawn a marker
-            if(proxy.root.name != "[RigManager (Blank)]")
-            {
-                return false;
-            }
+            // TODO:
+            // Check if the player is the first ever rig to get made,
+            // since in patch 4+ the rig manager is a pooled object
 
             // Makes it so any NPC with a gun can't spawn hitmarkers
             if (proxy.triggerType != TriggerRefProxy.TriggerType.Player)
@@ -98,12 +94,23 @@ namespace NEP.Hitmarkers
         {
             __instance.onCollision.AddListener(new System.Action<Collider, Vector3, Vector3>((hitCol, world, normal) =>
             {
+                MarrowBody cachedHit = MarrowBody.Cache.Get(hitCol.gameObject);
+
+                if (cachedHit == null)
+                {
+                    return;
+                }
+
+                MarrowEntity entity = cachedHit.Entity;
+
+                AIBrain brain = entity.GetComponent<AIBrain>();
+
                 var hitData = new HitData()
                 {
                     projectile = __instance,
                     worldHit = world,
                     collider = hitCol,
-                    brain = hitCol.GetComponentInParent<AIBrain>()
+                    brain = brain
                 };
 
                 HitDirector.OnHit?.Invoke(hitData);

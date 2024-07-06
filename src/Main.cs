@@ -1,13 +1,10 @@
 ﻿using MelonLoader;
 
-using BoneLib;
 using BoneLib.BoneMenu;
-using BoneLib.BoneMenu.Elements;
 
-using SLZ.Marrow.Utilities;
+using Il2CppSLZ.Marrow.Utilities;
 
 using UnityEngine;
-using System.Reflection;
 
 namespace NEP.Hitmarkers
 {
@@ -17,18 +14,20 @@ namespace NEP.Hitmarkers
         public const string Description = "Simple hitmarkers mod for BONELAB."; // Description for the Mod.  (Set as null if none)
         public const string Author = "Not Enough Photons"; // Author of the Mod.  (MUST BE SET)
         public const string Company = "Not Enough Photons"; // Company that made the Mod.  (Set as null if none)
-        public const string Version = "2.7.5"; // Version of the Mod.  (MUST BE SET)
+        public const string Version = "2.8.0"; // Version of the Mod.  (MUST BE SET)
         public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
     }
-
+    
     public class Main : MelonMod
     {
+        public static MelonLogger.Instance Logger;
+
         internal const string EmbeddedModule = "NEP.Hitmarkers.Resources.HitmarkersFusionModule.dll";
 
         public override void OnInitializeMelon()
         {
-            var moduleData = Data.DataManager.Internal_LoadFromAssembly(Assembly.GetExecutingAssembly(), EmbeddedModule);
-            Assembly.Load(moduleData);
+            var moduleData = Data.DataManager.Internal_LoadFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), EmbeddedModule);
+            System.Reflection.Assembly.Load(moduleData);
 
             Data.Options.Init();
 
@@ -47,48 +46,31 @@ namespace NEP.Hitmarkers
 
         private void SetupBoneMenu()
         {
-            MenuCategory hitmarkersCategory = null;
+            Page nepPage = Page.Root.CreatePage("Not Enough Photons", Color.white);
+            Page hitmarkersPage = nepPage.CreatePage("Hitmarkers", Color.white);
 
-            if (MenuManager.GetCategory("Not Enough Photons") != null)
-            {
-                hitmarkersCategory = MenuManager.GetCategory("Not Enough Photons");
-            }
-            else
-            {
-                hitmarkersCategory = MenuManager.CreateCategory("Not Enough Photons", "#08104d");
-            }
+            Page.Root.CreatePageLink(nepPage);
+            nepPage.CreatePageLink(hitmarkersPage);
 
-            var options = hitmarkersCategory.CreateCategory("Hitmarkers", Color.white);
-
-            options.CreateBoolElement(
+            hitmarkersPage.CreateBool(
                 "Enable Hitmarkers", 
                 Color.white, 
                 Data.Options.EnableHitmarkers, 
                 (value) => Data.Options.SetEnableHitmarkers(value));
 
-            options.CreateFloatElement(
+            hitmarkersPage.CreateFloat(
                 "Hitmarker SFX", 
-                Color.white, 
-                Data.Options.HitmarkerSFX, 
-                10f, 0f, 100f, 
+                Color.white,
+                10f,
+                Data.Options.HitmarkerSFX, 0f, 100f, 
                 (value) => Data.Options.SetHitmarkerSFX(value));
 
-            options.CreateFloatElement(
+            hitmarkersPage.CreateFloat(
                 "Hitmarker Pitch", 
                 Color.white, 
-                Data.Options.HitmarkerPitch, 
-                0.25f, 0f, 2f, 
+                0.25f, 
+                Data.Options.HitmarkerPitch, 0f, 2f, 
                 (value) => Data.Options.SetHitmarkerPitch(value));
-
-            options.CreateFunctionElement(
-                "Test Proxy",
-                Color.white,
-                () =>
-                {
-                    var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    obj.AddComponent<HitmarkerProxy>();
-                }
-                );
         }
     }
 }
