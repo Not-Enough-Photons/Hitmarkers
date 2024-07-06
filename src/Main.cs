@@ -39,8 +39,7 @@ namespace NEP.Hitmarkers
 
         public void OnMarrowGameStart()
         {
-            new UnityEngine.GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
-            new UnityEngine.GameObject("Hitmarker Audio").AddComponent<Audio.HitmarkerAudio>();
+            new GameObject("Hitmarker Manager").AddComponent<HitmarkerManager>();
             HitDirector.Initialize();
         }
 

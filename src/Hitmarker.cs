@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using NEP.Hitmarkers.Data;
+using Il2CppSLZ.Marrow.Audio;
 
 namespace NEP.Hitmarkers
 {
@@ -105,9 +106,8 @@ namespace NEP.Hitmarkers
         private void PlayAudio()
         {
             var selectedList = !_isFinisher ? _hitAudio : _finisherAudio;
-            AudioClip clip = selectedList[Random.Range(0, selectedList.Length)];
 
-            Audio.HitmarkerAudio.PlayAtPoint(clip, transform.position);
+            BoneLib.Audio.Play2DOneShot(selectedList, BoneLib.Audio.UI, Options.HitmarkerSFX, Options.HitmarkerPitch);
         }
 
         private void SetTextures()
