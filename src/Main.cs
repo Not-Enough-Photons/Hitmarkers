@@ -5,6 +5,7 @@ using BoneLib.BoneMenu;
 using Il2CppSLZ.Marrow.Utilities;
 
 using UnityEngine;
+using NEP.Hitmarkers.Data;
 
 namespace NEP.Hitmarkers
 {
@@ -20,20 +21,18 @@ namespace NEP.Hitmarkers
     
     public class Main : MelonMod
     {
-        public static MelonLogger.Instance Logger;
-
         internal const string EmbeddedModule = "NEP.Hitmarkers.Resources.HitmarkersFusionModule.dll";
 
         public override void OnInitializeMelon()
         {
-            var moduleData = Data.DataManager.Internal_LoadFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), EmbeddedModule);
-            System.Reflection.Assembly.Load(moduleData);
+            // var moduleData = Data.DataManager.Internal_LoadFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), EmbeddedModule);
+            // System.Reflection.Assembly.Load(moduleData);
 
-            Data.Options.Init();
+            DataManager.Initialize();
+            Options.Init();
 
             SetupBoneMenu();
 
-            Data.DataManager.Initialize();
             MarrowGame.RegisterOnReadyAction(new System.Action(() => OnMarrowGameStart()));
         }
 
@@ -47,9 +46,12 @@ namespace NEP.Hitmarkers
         {
             Page nepPage = Page.Root.CreatePage("Not Enough Photons", Color.white);
             Page hitmarkersPage = nepPage.CreatePage("Hitmarkers", Color.white);
+            Page customMarkersPage = nepPage.CreatePage("Skins", Color.white, 5);
 
             Page.Root.CreatePageLink(nepPage);
             nepPage.CreatePageLink(hitmarkersPage);
+
+            hitmarkersPage.CreatePageLink(customMarkersPage);
 
             hitmarkersPage.CreateBool(
                 "Enable Hitmarkers", 
@@ -70,6 +72,15 @@ namespace NEP.Hitmarkers
                 0.25f, 
                 Data.Options.HitmarkerPitch, 0f, 2f, 
                 (value) => Data.Options.SetHitmarkerPitch(value));
+
+            for (int i = 0; i < DataManager.Skins.Length; i++)
+            {
+                int index = i;
+                customMarkersPage.CreateFunction(DataManager.Skins[index].SkinName, Color.white, () =>
+                {
+                    HitmarkerManager.Instance.SetMarkerSkin(DataManager.Skins[index]);
+                });
+            }
         }
     }
 }

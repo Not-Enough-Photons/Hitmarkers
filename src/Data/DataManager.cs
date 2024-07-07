@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
-using AudioImportLib;
-
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using MelonLoader.Utils;
+
+using BoneLib;
+using MelonLoader;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -32,37 +32,23 @@ namespace NEP.Hitmarkers.Data
             get => _animations.ToArray();
         }
 
-        public static Texture2D[] Textures
+        public static MarkerSkin[] Skins
         {
-            get => _textures.ToArray();
-        }
-
-        public static AudioClip[] HitClips
-        {
-            get => _clipHitmarkers.ToArray();
-        }
-
-        public static AudioClip[] FinisherClips
-        {
-            get => _clipFinishers.ToArray();
+            get => _skins;
         }
 
         static readonly string path_UserData = MelonEnvironment.UserDataDirectory;
-        static readonly string path_Developer = path_UserData + "/Not Enough Photons";
-        static readonly string path_Mod = path_Developer + "/Hitmarkers";
+        static readonly string path_Developer = Path.Combine(path_UserData, "Not Enough Photons");
+        static readonly string path_Mod = Path.Combine(path_Developer, "Hitmarkers");
 
-        static readonly string path_Resources = path_Mod + "/resources.pack";
-        static readonly string path_Audio = path_Mod + "/Audio";
-        static readonly string path_Textures = path_Mod + "/Textures";
+        static readonly string path_Skins = Path.Combine(path_Mod, "Skins");
 
         static AssetBundle _bundle;
         static Object[] _bundleObjects;
+        static MarkerSkin[] _skins;
 
         static List<GameObject> _gameObjects;
         static List<AnimationClip> _animations;
-        static List<AudioClip> _clipHitmarkers;
-        static List<AudioClip> _clipFinishers;
-        static List<Texture2D> _textures;
 
         public static void Initialize()
         {
@@ -70,17 +56,15 @@ namespace NEP.Hitmarkers.Data
 
             _gameObjects = new List<GameObject>();
             _animations = new List<AnimationClip>();
-            _textures = new List<Texture2D>();
-            _clipHitmarkers = new List<AudioClip>();
-            _clipFinishers = new List<AudioClip>();
 
-            _bundle = GetEmbeddedBundle();
+            string bundleNamespace = "NEP.Hitmarkers.Resources.";
+            string bundleName = BoneLib.HelperMethods.IsAndroid() ? "resources_quest.pack" : "resources_pcvr.pack";
+            _bundle = HelperMethods.LoadEmbeddedAssetBundle(Assembly.GetExecutingAssembly(), bundleNamespace + bundleName);
             _bundleObjects = _bundle.LoadAllAssets();
 
-            GetGameObjects();
-            GetAnimations();
-            GetAudio();
-            GetTextures();
+            GetObjects(_gameObjects);
+            GetObjects(_animations);
+            _skins = LoadMarkerSkins();
         }
 
         public static GameObject GetGameObject(string name)
@@ -88,124 +72,90 @@ namespace NEP.Hitmarkers.Data
             return _gameObjects.Find((match) => match.name == name);
         }
 
-        public static Texture2D GetTexture(string name)
+        public static MarkerSkin GetMarkerSkin(string name)
         {
-            return _textures.Find((match) => match.name == name);
+            HashSet<MarkerSkin> query = new HashSet<MarkerSkin>(_skins);
+
+            foreach (var skin in query)
+            {
+                if (skin.SkinName == name)
+                {
+                    return skin;
+                }
+            }
+
+            return null;
+        }
+
+        public static MarkerSkin[] LoadMarkerSkins()
+        {
+            string[] directories = Directory.GetDirectories(path_Skins);
+            MarkerSkin[] skins = new MarkerSkin[directories.Length];
+
+            for (int i = 0; i < skins.Length; i++)
+            {
+                skins[i] = CreateMarkerSkin(directories[i]);
+            }
+
+            return skins;
+        }
+
+        public static MarkerSkin CreateMarkerSkin(string skinPath)
+        {
+            if (!Directory.Exists(skinPath))
+            {
+                throw new System.Exception("Path does not exist! " + skinPath);
+            }
+
+            string skinName = new DirectoryInfo(skinPath).Name;
+
+            Texture2D marker = LoadTexture(skinPath, "marker.png");
+            Texture2D finisher = LoadTexture(skinPath, "finisher_marker.png");
+            Texture2D skull = LoadTexture(skinPath, "finisher_feedback.png");
+
+            return new MarkerSkin(skinName, marker, finisher, skull, null, null);
         }
 
         static void GenerateFolders()
         {
             Directory.CreateDirectory(path_Mod);
-            Directory.CreateDirectory(path_Textures);
-            Directory.CreateDirectory(path_Audio);
         }
 
-        static void GetGameObjects()
+        static void GetObjects<T>(List<T> list) where T : Object
         {
             foreach (var obj in _bundleObjects)
             {
-                var go = obj.TryCast<GameObject>();
+                var target = obj.TryCast<T>();
 
-                if (go != null)
+                if (target != null)
                 {
-                    go.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                    _gameObjects.Add(go);
+                    target.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                    list.Add(target);
                 }
             }
         }
 
-        static void GetAnimations()
+        static Texture2D LoadTexture(string skinPath, string textureName)
         {
-            foreach (var obj in _bundleObjects)
+            string assetPath = Path.Combine(skinPath, textureName);
+            Texture2D texture = new Texture2D(2, 2);
+
+            if (!File.Exists(assetPath))
             {
-                var go = obj.TryCast<AnimationClip>();
-
-                if (go != null)
-                {
-                    go.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                    _animations.Add(go);
-                }
-            }
-        }
-
-        static void GetAudio()
-        {
-            foreach (var file in Directory.GetFiles(path_Audio))
-            {
-                string newName = file.Substring(path_Audio.Length + 1);
-                MelonLoader.Melon<Main>.Logger.Msg($"Loading Clip {newName}...");
-
-                if (newName.StartsWith("marker_"))
-                {
-                    _clipHitmarkers.Add(API.LoadAudioClip(file));
-                }
-                else if (newName.StartsWith("finisher_"))
-                {
-                    _clipFinishers.Add(API.LoadAudioClip(file));
-                }
-
-                MelonLoader.Melon<Main>.Logger.Msg($"Successfully Loaded {newName}!");
-            }
-        }
-
-        static void GetTextures()
-        {
-            foreach (var file in Directory.GetFiles(path_Textures))
-            {
-                string newName = file.Substring(path_Textures.Length + 1);
-                MelonLoader.Melon<Main>.Logger.Msg($"Loading Texture {newName}...");
-
-                Texture2D texture = new Texture2D(2, 2);
-
-                if (!File.Exists(file))
-                {
-                    MelonLoader.Melon<Main>.Logger.Warning($"Couldn't load {newName}! Going to use a white square instead.");
-                }
-                else
-                {
-                    byte[] data = File.ReadAllBytes(file);
-                    ImageConversion.LoadImage(texture, data);
-                }
-
-                texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                texture.name = newName;
-
-                MelonLoader.Melon<Main>.Logger.Msg($"Successfully loaded {texture.name}!");
-                _textures.Add(texture);
-            }
-        }
-
-        internal static AssetBundle GetEmbeddedBundle()
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            string fileName = BoneLib.HelperMethods.IsAndroid() ? "resources_quest.pack" : "resources_pcvr.pack";
-
-            using (Stream resourceStream = assembly.GetManifestResourceStream("NEP.Hitmarkers.Resources." + fileName))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    resourceStream.CopyTo(memoryStream);
-                    return AssetBundle.LoadFromMemory(memoryStream.ToArray());
-                }
-            }
-        }
-
-        internal static byte[] Internal_LoadFromAssembly(Assembly assembly, string name)
-        {
-            string[] manifestResources = assembly.GetManifestResourceNames();
-
-            if (manifestResources.Contains(name))
-            {
-                using (Stream str = assembly.GetManifestResourceStream(name))
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    str.CopyTo(memoryStream);
-                    return memoryStream.ToArray();
-                }
+                Melon<Main>.Logger.Warning($"{textureName} does not exist in {skinPath}!");
+                return null;
             }
 
-            return null;
+            byte[] data = File.ReadAllBytes(assetPath);
+
+            if (!ImageConversion.LoadImage(texture, data))
+            {
+                Melon<Main>.Logger.Warning($"{textureName} failed to load! The data is likely corrupted or invalid.");
+                return null;
+            }
+
+            texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            return texture;
         }
     }
 }

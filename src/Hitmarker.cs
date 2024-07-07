@@ -37,6 +37,10 @@ namespace NEP.Hitmarkers
         private GameObject _markerObject;
         private GameObject _finisherObject;
 
+        private Material _markerMaterial;
+        private Material _finisherMaterial;
+        private Material _finisherSkullMaterial;
+
         private AudioSource _source;
 
         private float _timerHide = 0f;
@@ -44,9 +48,6 @@ namespace NEP.Hitmarkers
 
         private void Awake()
         {
-            _hitAudio = DataManager.HitClips;
-            _finisherAudio = DataManager.FinisherClips;
-
             _markerObject = transform.Find("Marker").gameObject;
             _finisherObject = transform.Find("Finisher").gameObject;
 
@@ -55,14 +56,17 @@ namespace NEP.Hitmarkers
 
             _source = transform.Find("Source").GetComponent<AudioSource>();
 
-            SetTextures();
-
             _markerObject.SetActive(false);
             _finisherObject.SetActive(false);
+
+            _markerMaterial = _markerObject.GetComponent<MeshRenderer>().material;
+            _finisherMaterial = _finisherObject.GetComponent<MeshRenderer>().material;
+            _finisherSkullMaterial = _finisherObject.transform.Find("DeathSkull").GetComponent<MeshRenderer>().material;
         }
 
         private void OnEnable()
         {
+            SetTextures();
             PlayAnimation();
             PlayAudio();
         }
@@ -107,18 +111,22 @@ namespace NEP.Hitmarkers
         {
             var selectedList = !_isFinisher ? _hitAudio : _finisherAudio;
 
+            if (selectedList == null)
+            {
+                return;
+            }
+
             BoneLib.Audio.Play2DOneShot(selectedList, BoneLib.Audio.UI, Options.HitmarkerSFX, Options.HitmarkerPitch);
         }
 
         private void SetTextures()
         {
-            Material markerMaterial = _markerObject.GetComponent<MeshRenderer>().material;
-            Material finisherMaterial = _finisherObject.GetComponent<MeshRenderer>().material;
-            Material finisherSkullMaterial = _finisherObject.transform.Find("DeathSkull").GetComponent<MeshRenderer>().material;
+            MarkerSkin skin = HitmarkerManager.Instance.Skin;
+            MarkerSkin defaultSkin = HitmarkerManager.Instance.DefaultSkin;
 
-            markerMaterial.mainTexture = DataManager.GetTexture("marker.png");
-            finisherMaterial.mainTexture = DataManager.GetTexture("finisher_marker.png");
-            finisherSkullMaterial.mainTexture = DataManager.GetTexture("finisher_feedback.png");
+            _markerMaterial.mainTexture = skin.Marker != null ? skin.Marker : defaultSkin.Marker;
+            _finisherMaterial.mainTexture = skin.Finisher != null ? skin.Finisher : defaultSkin.Finisher;
+            _finisherSkullMaterial.mainTexture = skin.FinisherSkull != null ? skin.FinisherSkull : defaultSkin.FinisherSkull;
         }
     }
 }

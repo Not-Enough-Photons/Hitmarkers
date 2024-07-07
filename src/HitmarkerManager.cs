@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using BoneLib;
+using NEP.Hitmarkers.Data;
 
 namespace NEP.Hitmarkers
 {
@@ -11,6 +12,9 @@ namespace NEP.Hitmarkers
         public HitmarkerManager(System.IntPtr ptr) : base(ptr) { }
 
         public static HitmarkerManager Instance;
+
+        public MarkerSkin Skin { get; private set; }
+        public MarkerSkin DefaultSkin => DataManager.GetMarkerSkin("Default");
 
         private List<Hitmarker> _hitmarkers;
         private List<Hitmarker> _finishers;
@@ -79,6 +83,11 @@ namespace NEP.Hitmarkers
             }
 
             return null;
+        }
+
+        public void SetMarkerSkin(MarkerSkin skin)
+        {
+            Skin = skin;
         }
 
         public void SpawnMarker(Vector3 position, bool finisher = false)
