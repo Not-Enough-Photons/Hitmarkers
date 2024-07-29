@@ -2,10 +2,9 @@
 
 using UnityEngine;
 
+using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.AI;
-using Il2CppSLZ.Combat;
 using Il2CppSLZ.Marrow.PuppetMasta;
-using Il2CppSLZ.Rig;
 using Il2CppSLZ.Marrow.Interaction;
 
 using BoneLib;

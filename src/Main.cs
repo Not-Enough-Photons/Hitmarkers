@@ -44,14 +44,9 @@ namespace NEP.Hitmarkers
 
         private void SetupBoneMenu()
         {
-            Page nepPage = Page.Root.CreatePage("Not Enough Photons", Color.white);
-            Page hitmarkersPage = nepPage.CreatePage("Hitmarkers", Color.white);
-            Page customMarkersPage = nepPage.CreatePage("Skins", Color.white, 5);
-
-            Page.Root.CreatePageLink(nepPage);
-            nepPage.CreatePageLink(hitmarkersPage);
-
-            hitmarkersPage.CreatePageLink(customMarkersPage);
+            Page nepPage = Page.Root.CreatePage("Not Enough Photons", Color.white, maxElements: 8, createLink: true);
+            Page hitmarkersPage = nepPage.CreatePage("Hitmarkers", Color.white, maxElements: 0, createLink: true);
+            Page customMarkersPage = hitmarkersPage.CreatePage("Skins", Color.white, maxElements: 8, createLink: true);
 
             hitmarkersPage.CreateBool(
                 "Enable Hitmarkers", 
