@@ -14,6 +14,7 @@ namespace NEP.Hitmarkers
         public static HitmarkerManager Instance;
 
         public MarkerSkin Skin { get; private set; }
+        public MarkerSkin FavoriteSkin => DataManager.GetMarkerSkin(Options.FavoriteSkin);
         public MarkerSkin DefaultSkin => DataManager.GetMarkerSkin("Default");
 
         private List<Hitmarker> _hitmarkers;

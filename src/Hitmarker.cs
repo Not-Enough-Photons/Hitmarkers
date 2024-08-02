@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 using NEP.Hitmarkers.Data;
-using Il2CppSLZ.Marrow.Audio;
 
 namespace NEP.Hitmarkers
 {
@@ -67,6 +66,7 @@ namespace NEP.Hitmarkers
         private void OnEnable()
         {
             SetTextures();
+            SetAudio();
             PlayAnimation();
             PlayAudio();
         }
@@ -119,14 +119,62 @@ namespace NEP.Hitmarkers
             BoneLib.Audio.Play2DOneShot(selectedList, BoneLib.Audio.UI, Options.HitmarkerSFX, Options.HitmarkerPitch);
         }
 
+        private void SetAudio()
+        {
+            MarkerSkin skin = HitmarkerManager.Instance.Skin;
+            MarkerSkin favoriteSkin = HitmarkerManager.Instance.FavoriteSkin;
+            MarkerSkin defaultSkin = HitmarkerManager.Instance.DefaultSkin;
+
+            if (skin == null)
+            {
+                _hitAudio = favoriteSkin.HitClips;
+                _finisherAudio = favoriteSkin.FinisherClips;
+                return;
+            }
+            else if (skin == null &&  favoriteSkin == null)
+            {
+                _hitAudio = defaultSkin.HitClips;
+                _finisherAudio = defaultSkin.FinisherClips;
+                return;
+            }
+            else if (defaultSkin == null)
+            {
+                // How did we get here?
+                throw new System.NullReferenceException("Default fallback skin is missing!");
+            }
+
+            _hitAudio = skin.HitClips != null ? skin.HitClips : favoriteSkin.HitClips;
+            _finisherAudio = skin.FinisherClips != null ? skin.FinisherClips : favoriteSkin.FinisherClips;
+        }
+
         private void SetTextures()
         {
             MarkerSkin skin = HitmarkerManager.Instance.Skin;
+            MarkerSkin favoriteSkin = HitmarkerManager.Instance.FavoriteSkin;
             MarkerSkin defaultSkin = HitmarkerManager.Instance.DefaultSkin;
 
-            _markerMaterial.mainTexture = skin.Marker != null ? skin.Marker : defaultSkin.Marker;
-            _finisherMaterial.mainTexture = skin.Finisher != null ? skin.Finisher : defaultSkin.Finisher;
-            _finisherSkullMaterial.mainTexture = skin.FinisherSkull != null ? skin.FinisherSkull : defaultSkin.FinisherSkull;
+            if (skin == null)
+            {
+                _markerMaterial.mainTexture = favoriteSkin.Marker;
+                _finisherMaterial.mainTexture = favoriteSkin.Finisher;
+                _finisherSkullMaterial.mainTexture = favoriteSkin.FinisherSkull;
+                return;
+            }
+            else if (skin == null && favoriteSkin == null)
+            {
+                _markerMaterial.mainTexture = defaultSkin.Marker;
+                _finisherMaterial.mainTexture = defaultSkin.Finisher;
+                _finisherSkullMaterial.mainTexture = defaultSkin.FinisherSkull;
+            }
+            else if (defaultSkin == null)
+            {
+                // How did we get here?
+                throw new System.NullReferenceException("Default fallback skin is missing!");
+            }
+
+            _markerMaterial.mainTexture = skin.Marker != null ? skin.Marker : favoriteSkin.Marker;
+            _finisherMaterial.mainTexture = skin.Finisher != null ? skin.Finisher : favoriteSkin.Finisher;
+            _finisherSkullMaterial.mainTexture = skin.FinisherSkull != null ? skin.FinisherSkull : favoriteSkin.FinisherSkull;
         }
     }
 }

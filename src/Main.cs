@@ -21,15 +21,18 @@ namespace NEP.Hitmarkers
     
     public class Main : MelonMod
     {
+        public static MelonLogger Logger = new MelonLogger();
+
         internal const string EmbeddedModule = "NEP.Hitmarkers.Resources.HitmarkersFusionModule.dll";
 
         public override void OnInitializeMelon()
         {
+            Logger = new MelonLogger();
             // var moduleData = Data.DataManager.Internal_LoadFromAssembly(System.Reflection.Assembly.GetExecutingAssembly(), EmbeddedModule);
             // System.Reflection.Assembly.Load(moduleData);
 
             DataManager.Initialize();
-            Options.Init();
+            Options.Initialize();
 
             SetupBoneMenu();
 
@@ -51,22 +54,27 @@ namespace NEP.Hitmarkers
             hitmarkersPage.CreateBool(
                 "Enable Hitmarkers", 
                 Color.white, 
-                Data.Options.EnableHitmarkers, 
-                (value) => Data.Options.SetEnableHitmarkers(value));
+                Options.EnableHitmarkers, 
+                (value) => Options.SetEnableHitmarkers(value));
 
             hitmarkersPage.CreateFloat(
                 "Hitmarker SFX", 
                 Color.white,
                 10f,
-                Data.Options.HitmarkerSFX, 0f, 100f, 
-                (value) => Data.Options.SetHitmarkerSFX(value));
+                Options.HitmarkerSFX, 0f, 100f, 
+                (value) => Options.SetHitmarkerVolume(value));
 
             hitmarkersPage.CreateFloat(
                 "Hitmarker Pitch", 
                 Color.white, 
                 0.25f, 
-                Data.Options.HitmarkerPitch, 0f, 2f, 
-                (value) => Data.Options.SetHitmarkerPitch(value));
+                Options.HitmarkerPitch, 0f, 2f, 
+                (value) => Options.SetHitmarkerPitch(value));
+
+            var favMarkerPage = hitmarkersPage.CreatePage(
+                "Set Default Marker",
+                Color.white,
+                maxElements: 8);
 
             for (int i = 0; i < DataManager.Skins.Length; i++)
             {
@@ -74,6 +82,15 @@ namespace NEP.Hitmarkers
                 customMarkersPage.CreateFunction(DataManager.Skins[index].SkinName, Color.white, () =>
                 {
                     HitmarkerManager.Instance.SetMarkerSkin(DataManager.Skins[index]);
+                });
+            }
+
+            for (int i = 0; i < DataManager.Skins.Length; i++)
+            {
+                int index = i;
+                favMarkerPage.CreateFunction(DataManager.Skins[index].SkinName, Color.white, () =>
+                {
+                    Options.SetDefaultSkin(DataManager.Skins[index].SkinName);
                 });
             }
         }

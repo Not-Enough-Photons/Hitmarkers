@@ -7,6 +7,7 @@ using MelonLoader.Utils;
 
 using BoneLib;
 using MelonLoader;
+using AudioImportLib;
 
 namespace NEP.Hitmarkers.Data
 {
@@ -37,34 +38,33 @@ namespace NEP.Hitmarkers.Data
             get => _skins;
         }
 
-        static readonly string path_UserData = MelonEnvironment.UserDataDirectory;
-        static readonly string path_Developer = Path.Combine(path_UserData, "Not Enough Photons");
-        static readonly string path_Mod = Path.Combine(path_Developer, "Hitmarkers");
+        private static readonly string path_UserData = MelonEnvironment.UserDataDirectory;
+        private static readonly string path_Developer = Path.Combine(path_UserData, "Not Enough Photons");
+        private static readonly string path_Mod = Path.Combine(path_Developer, "Hitmarkers");
 
-        static readonly string path_Skins = Path.Combine(path_Mod, "Skins");
+        private static readonly string path_Skins = Path.Combine(path_Mod, "Skins");
 
-        static AssetBundle _bundle;
-        static Object[] _bundleObjects;
-        static MarkerSkin[] _skins;
+        private static AssetBundle _bundle;
+        private static Object[] _bundleObjects;
+        private static MarkerSkin[] _skins;
 
-        static List<GameObject> _gameObjects;
-        static List<AnimationClip> _animations;
+        private static List<GameObject> _gameObjects;
+        private static List<AnimationClip> _animations;
+
+        internal static bool _initialized;
 
         public static void Initialize()
         {
+            if (_initialized)
+            {
+                return;
+            }
+
             GenerateFolders();
+            LoadBundles();
+            LoadObjects();
 
-            _gameObjects = new List<GameObject>();
-            _animations = new List<AnimationClip>();
-
-            string bundleNamespace = "NEP.Hitmarkers.Resources.";
-            string bundleName = BoneLib.HelperMethods.IsAndroid() ? "resources_quest.pack" : "resources_pcvr.pack";
-            _bundle = HelperMethods.LoadEmbeddedAssetBundle(Assembly.GetExecutingAssembly(), bundleNamespace + bundleName);
-            _bundleObjects = _bundle.LoadAllAssets();
-
-            GetObjects(_gameObjects);
-            GetObjects(_animations);
-            _skins = LoadMarkerSkins();
+            _initialized = true;
         }
 
         public static GameObject GetGameObject(string name)
@@ -113,15 +113,35 @@ namespace NEP.Hitmarkers.Data
             Texture2D finisher = LoadTexture(skinPath, "finisher_marker.png");
             Texture2D skull = LoadTexture(skinPath, "finisher_feedback.png");
 
-            return new MarkerSkin(skinName, marker, finisher, skull, null, null);
+            AudioClip[] hitClips = LoadClips(skinPath, "marker");
+            AudioClip[] finisherClips = LoadClips(skinPath, "finisher");
+
+            return new MarkerSkin(skinName, marker, finisher, skull, hitClips, finisherClips);
         }
 
-        static void GenerateFolders()
+        private static void LoadBundles()
+        {
+            string bundleNamespace = "NEP.Hitmarkers.Resources.";
+            string bundleName = HelperMethods.IsAndroid() ? "resources_quest.pack" : "resources_pcvr.pack";
+            _bundle = HelperMethods.LoadEmbeddedAssetBundle(Assembly.GetExecutingAssembly(), bundleNamespace + bundleName);
+            _bundleObjects = _bundle.LoadAllAssets();
+        }
+
+        private static void LoadObjects()
+        {
+            _gameObjects = new List<GameObject>();
+            _animations = new List<AnimationClip>();
+            GetObjects(_gameObjects);
+            GetObjects(_animations);
+            _skins = LoadMarkerSkins();
+        }
+
+        private static void GenerateFolders()
         {
             Directory.CreateDirectory(path_Mod);
         }
 
-        static void GetObjects<T>(List<T> list) where T : Object
+        private static void GetObjects<T>(List<T> list) where T : Object
         {
             foreach (var obj in _bundleObjects)
             {
@@ -135,7 +155,7 @@ namespace NEP.Hitmarkers.Data
             }
         }
 
-        static Texture2D LoadTexture(string skinPath, string textureName)
+        private static Texture2D LoadTexture(string skinPath, string textureName)
         {
             string assetPath = Path.Combine(skinPath, textureName);
             Texture2D texture = new Texture2D(2, 2);
@@ -156,6 +176,29 @@ namespace NEP.Hitmarkers.Data
 
             texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
             return texture;
+        }
+
+        private static AudioClip[] LoadClips(string skinPath, string searchTerm)
+        {
+            string sfxPath = Path.Combine(skinPath, "SFX");
+
+            if (!Directory.Exists(sfxPath))
+            {
+                return null;
+            }
+
+            string[] files = Directory.GetFiles(sfxPath);
+            List<AudioClip> clips = new List<AudioClip>();
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (new DirectoryInfo(files[i]).Name.StartsWith(searchTerm))
+                {
+                    clips.Add(AudioImportLib.API.LoadAudioClip(files[i], true));
+                }
+            }
+
+            return clips.ToArray();
         }
     }
 }
