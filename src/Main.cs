@@ -1,10 +1,11 @@
 ﻿using MelonLoader;
 
+using UnityEngine;
+
 using BoneLib.BoneMenu;
 
 using Il2CppSLZ.Marrow.Utilities;
 
-using UnityEngine;
 using NEP.Hitmarkers.Data;
 
 namespace NEP.Hitmarkers

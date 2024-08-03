@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+using UnityEngine;
+
 using BoneLib;
+
 using NEP.Hitmarkers.Data;
 
 namespace NEP.Hitmarkers

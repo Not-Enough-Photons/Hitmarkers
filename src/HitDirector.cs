@@ -7,8 +7,6 @@ using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.PuppetMasta;
 using Il2CppSLZ.Marrow.Interaction;
 
-using BoneLib;
-
 namespace NEP.Hitmarkers
 {
     public static class HitDirector

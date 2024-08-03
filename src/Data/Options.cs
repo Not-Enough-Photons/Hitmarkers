@@ -1,5 +1,6 @@
-﻿using BoneLib;
-using MelonLoader;
+﻿using MelonLoader;
+
+using BoneLib;
 
 namespace NEP.Hitmarkers.Data
 {
