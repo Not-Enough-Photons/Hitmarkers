@@ -24,6 +24,7 @@ namespace NEP.Hitmarkers
 
         public static bool EvaluateHit(HitData data)
         {
+            MelonLoader.Melon<Main>.Logger.Msg("Evaluating Hit");
             TriggerRefProxy proxy = data.projectile._proxy;
             
             // TODO:
@@ -91,6 +92,7 @@ namespace NEP.Hitmarkers
         {
             __instance.onCollision.AddListener(new System.Action<Collider, Vector3, Vector3>((hitCol, world, normal) =>
             {
+                MelonLoader.Melon<Main>.Logger.Msg("OnCollisionBefore");
                 MarrowBody cachedHit = MarrowBody.Cache.Get(hitCol.gameObject);
 
                 if (cachedHit == null)
@@ -111,6 +113,7 @@ namespace NEP.Hitmarkers
                 };
 
                 HitDirector.OnHit?.Invoke(hitData);
+                MelonLoader.Melon<Main>.Logger.Msg("OnCollisionAfter");
             }));
         }
     }
