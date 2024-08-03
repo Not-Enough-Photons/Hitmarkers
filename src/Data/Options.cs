@@ -59,30 +59,36 @@ namespace NEP.Hitmarkers.Data
             EnableHitmarkers = _enableHitmarkers;
             HitmarkerSFX = _hitmarkerVolume;
             HitmarkerPitch = _hitmarkerPitch;
+
+            MelonPreferences.Save();
         }
 
         public static void SetDefaultSkin(string skin)
         {
             _favoritedSkin.entry.Value = skin;
             FavoriteSkin = _favoritedSkin;
+            MelonPreferences.Save();
         }
 
         public static void SetEnableHitmarkers(bool enable)
         {
             _enableHitmarkers.entry.Value = enable;
             EnableHitmarkers = _enableHitmarkers;
+            MelonPreferences.Save();
         }
 
         public static void SetHitmarkerVolume(float volume)
         {
             _hitmarkerVolume.entry.Value = volume;
             HitmarkerSFX = _hitmarkerVolume;
+            MelonPreferences.Save();
         }
 
         public static void SetHitmarkerPitch(float pitch)
         {
             _hitmarkerPitch.entry.Value = pitch;
             HitmarkerPitch = _hitmarkerPitch;
+            MelonPreferences.Save();
         }
     }
 }
